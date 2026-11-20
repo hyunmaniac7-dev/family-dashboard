@@ -2,11 +2,11 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- 태블릿 가로 전체 화면 및 안전영역(노치) 대응 뷰포트 -->
+    <!-- 태블릿 가로 전체 화면 및 노치/안전영역 대응 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>우리집 가족 대시보드</title>
 
-    <!-- 홈 화면에 추가 시 주소창 없이 꽉 찬 화면(Standalone)으로 실행 -->
+    <!-- 홈 화면에 추가 시 주소창 없이 꽉 찬 가로 화면(Standalone)으로 실행 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,7 @@
     <!-- Apple Touch Icon (인라인 SVG Data URI) -->
     <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%2374bdf5'/%3E%3Ccircle cx='256' cy='256' r='160' fill='%23ffffff' stroke='%232b3a4a' stroke-width='24'/%3E%3Cpath d='M96 256a160 160 0 0 1 320 0Z' fill='%23ef4444' stroke='%232b3a4a' stroke-width='24'/%3E%3Cline x1='96' y1='256' x2='416' y2='256' stroke='%232b3a4a' stroke-width='24'/%3E%3Ccircle cx='256' cy='256' r='48' fill='%23ffffff' stroke='%232b3a4a' stroke-width='22'/%3E%3C/svg%3E">
 
-    <!-- Google Fonts: 한글 둥글고 또렷한 폰트 + 레트로 픽셀 시계 폰트 -->
+    <!-- Google Fonts: 아이도 읽기 쉬운 둥근 한글 폰트 + 레트로 픽셀 시계 폰트 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&family=Silkscreen:wght@700&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
         }
     </script>
 
-    <!-- 참조 이미지의 정밀한 픽셀 테두리, 텍스트 외곽선, 잔디 패턴, 애니메이션 -->
+    <!-- 레트로 동화풍 외곽선, 픽셀 잔디 띠, 스크롤바 숨김 및 애니메이션 -->
     <style>
         :root {
             --ink: #2b3a4a;
@@ -50,13 +50,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 상단 하늘 배너 + 픽셀 구름 */
+        /* 상단 하늘색 그라데이션 배너 */
         .sky-banner {
             background: linear-gradient(180deg, #6db8f4 0%, #99d2fa 72%, #b5e0fc 100%);
             position: relative;
         }
 
-        /* 하늘 하단의 6px 픽셀 잔디 띠 */
+        /* 하늘 배너 하단 픽셀 잔디 띠 */
         .pixel-grass-strip {
             height: 7px;
             background-image: repeating-linear-gradient(
@@ -70,12 +70,12 @@
             border-bottom: 1.5px solid #2b3a4a;
         }
 
-        /* 1.5px 다크 슬레이트 공통 카드 테두리 */
+        /* 공통 1.5px 다크 슬레이트 테두리 */
         .ink-border {
             border: 1.5px solid #2b3a4a;
         }
 
-        /* 레트로 픽셀 시계 & 날짜 외곽선 효과 */
+        /* 레트로 픽셀 날짜 & 시계 외곽선 */
         .date-stroke {
             color: #ffffff;
             text-shadow:
@@ -108,7 +108,7 @@
                  1.5px  1.5px 0 #2b3a4a;
         }
 
-        /* 시계 콜론 부드러운 깜빡임 */
+        /* 콜론 깜빡임 */
         @keyframes colonBlink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0.25; }
@@ -117,23 +117,23 @@
             animation: colonBlink 1.2s infinite;
         }
 
-        /* 다음 차례(활성) 할 일 카드의 노란 테두리 강조 */
+        /* 아직 안 한 첫 번째 카드 강조 (노란 테두리 + 그림자) */
         .active-task-card {
             border: 3px solid #facc15 !important;
             box-shadow: 0 0 0 2px #2b3a4a, 0 8px 18px rgba(250, 204, 21, 0.35);
         }
 
-        /* 완료 카드 체크 스탬프 등장 애니메이션 */
+        /* 완료 스탬프 등장 효과 */
         @keyframes stampPop {
-            0% { transform: scale(1.6) rotate(-14deg); opacity: 0; }
-            65% { transform: scale(0.92) rotate(-6deg); opacity: 1; }
-            100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(1.6) rotate(-14deg); opacity: 0; }
+            65% { transform: translate(-50%, -50%) scale(0.92) rotate(-6deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(-8deg); opacity: 1; }
         }
         .stamp-pop {
             animation: stampPop 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        /* 마스코트 살짝 통통 튀는 효과 */
+        /* 마스코트 통통 튀기 */
         @keyframes gentleHop {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-4px); }
@@ -142,7 +142,7 @@
             animation: gentleHop 2.2s ease-in-out infinite;
         }
 
-        /* 반짝이 폭죽 효과 */
+        /* 완료 시 반짝이 폭죽 */
         @keyframes sparkleBurst {
             0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
             100% { transform: translate(var(--tx), var(--ty)) scale(1.1); opacity: 0; }
@@ -153,7 +153,16 @@
             animation: sparkleBurst 0.65s ease-out forwards;
         }
 
-        /* 태블릿 가로(lg 이상)에서는 스크롤 없이 100vh에 딱 맞게 고정 */
+        /* 상단 탭 가로 스크롤바 숨김 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 태블릿 가로(lg 이상)에서는 전체 100vh 고정, 카드 영역만 필요 시 내부 스크롤 */
         @media (min-width: 1024px) {
             body {
                 height: 100vh;
@@ -165,76 +174,77 @@
 <body class="w-full min-h-screen flex flex-col select-none">
 
     <!-- =====================================================================
-         1. 상단 하늘 배너 (약 26% 높이)
+         1. 상단 하늘 배너 (알약 네비게이션 + 동네 엠블럼 + 레트로 시계 + 날씨 카드)
     ====================================================================== -->
     <header class="sky-banner w-full shrink-0 lg:h-[27vh] flex flex-col justify-between overflow-hidden">
         <!-- 배경 장식: 귀여운 픽셀 스타일 구름 -->
-        <div class="pointer-events-none absolute top-11 left-[29%] w-16 h-4 bg-white/80 rounded-full"></div>
-        <div class="pointer-events-none absolute top-16 left-[40%] w-11 h-3.5 bg-white/85 rounded-full"></div>
-        <div class="pointer-events-none absolute top-9 right-[42%] w-14 h-3.5 bg-white/60 rounded-full"></div>
+        <div class="pointer-events-none absolute top-11 left-[28%] w-16 h-4 bg-white/80 rounded-full"></div>
+        <div class="pointer-events-none absolute top-16 left-[39%] w-11 h-3.5 bg-white/85 rounded-full"></div>
+        <div class="pointer-events-none absolute top-9 right-[44%] w-14 h-3.5 bg-white/60 rounded-full"></div>
 
-        <!-- 1-A. 상단 네비게이션 알약 탭 바 -->
+        <!-- 1-A. 상단 알약 네비게이션 바 (대시보드 + 가족 구성원 필터 + 시트/날씨/야간/WakeLock) -->
         <nav class="relative z-10 flex items-center justify-between gap-2 px-3 sm:px-4 pt-2 pb-1 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <!-- 왼쪽 흰색 브랜드 배지 알약 -->
-                <div class="inline-flex items-center gap-1.5 bg-white ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold text-[#2b3a4a] shadow-xs">
-                    <span class="w-3.5 h-3.5 rounded-full border-[1.5px] border-[#2b3a4a] bg-gradient-to-r from-[#2b3a4a] 50% to-white 50% inline-block"></span>
+            <!-- 왼쪽: 타이틀 + 가족 구성원(누구) 동적 필터 탭 -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- 브랜드 배지 알약 -->
+                <div class="inline-flex items-center gap-1.5 bg-white ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-black text-[#2b3a4a] shadow-xs">
+                    <span class="w-3.5 h-3.5 rounded-full border-[1.5px] border-[#2b3a4a] bg-gradient-to-b from-[#ef4444] 50% to-white 50% inline-block"></span>
                     <span>우리집</span>
                 </div>
 
-                <!-- 대시보드 (현재 활성 탭) -->
-                <div class="inline-flex items-center gap-1 bg-[#4b8ec9] text-white ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold shadow-xs">
-                    <span>🏠</span>
-                    <span>대시보드</span>
+                <!-- 가족 구성원(누구) 필터 탭 컨테이너 (시트에서 자동 생성) -->
+                <div id="member-filter-bar" class="flex items-center gap-1.5">
+                    <!-- JS로 '전체' + 구성원 알약 버튼 렌더링 -->
                 </div>
+            </div>
 
-                <!-- 할 일 / 출발시간 수정 버튼 -->
-                <button id="btn-open-editor" type="button"
-                    class="inline-flex items-center gap-1 bg-[#cde8fc]/90 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
-                    <span>✏️</span>
-                    <span>할 일 수정</span>
+            <!-- 오른쪽: 시트 동기화 상태/새로고침 + 날씨 새로고침 + 야간 미리보기 + Wake Lock -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- 구글 시트 동기화 상태 & 수동 새로고침 버튼 -->
+                <button id="btn-refresh-sheet" type="button" title="구글 시트에서 할 일 다시 불러오기"
+                    class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
+                    <span id="sheet-sync-icon">📋</span>
+                    <span id="sheet-sync-label">시트 연결 중</span>
                 </button>
 
                 <!-- 날씨 새로고침 버튼 -->
-                <button id="btn-refresh-weather" type="button"
-                    class="inline-flex items-center gap-1 bg-[#cde8fc]/90 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
-                    <span id="refresh-icon">🔄</span>
-                    <span>날씨 새로고침</span>
+                <button id="btn-refresh-weather" type="button" title="시흥시 목감동 날씨 새로고침"
+                    class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
+                    <span id="refresh-icon">🌤️</span>
+                    <span class="hidden xl:inline">날씨</span>
                 </button>
 
                 <!-- 야간 암전 미리보기 버튼 -->
-                <button id="btn-night-preview" type="button"
-                    class="inline-flex items-center gap-1 bg-[#cde8fc]/90 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
+                <button id="btn-night-preview" type="button" title="밤 10시~아침 7시 암전 모드 미리보기"
+                    class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span>🌙</span>
-                    <span>야간 미리보기</span>
+                    <span class="hidden xl:inline">야간</span>
                 </button>
-            </div>
 
-            <!-- 오른쪽: 잠깐 보기 카운트다운(야간) + Wake Lock 상태 배지 -->
-            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- 야간 20초 잠깐 보기 카운트다운 배지 -->
                 <div id="peek-badge" class="hidden items-center gap-1.5 bg-[#2b3a4a] text-white rounded-full px-3 py-1 text-xs sm:text-sm font-bold">
                     <span id="peek-timer-text">👀 20초</span>
                     <button id="btn-night-back" type="button" class="bg-[#facc15] text-[#2b3a4a] rounded-full px-2 py-0.5 text-xs font-extrabold">끄기</button>
                 </div>
 
-                <button id="btn-wakelock" type="button" title="화면 꺼짐 방지 상태"
-                    class="inline-flex items-center gap-1.5 bg-[#cde8fc]/90 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
+                <!-- Wake Lock 화면 꺼짐 방지 상태 -->
+                <button id="btn-wakelock" type="button" title="화면 자동 꺼짐 방지 상태"
+                    class="inline-flex items-center gap-1.5 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span id="wakelock-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-[#2b3a4a]"></span>
-                    <span id="wakelock-label">켜짐 확인 중</span>
+                    <span id="wakelock-label" class="hidden sm:inline">켜짐 유지</span>
                 </button>
             </div>
         </nav>
 
-        <!-- 1-B. 헤더 메인 영역: 왼쪽 동네/엠블럼 + 중앙 시계/날짜 + 오른쪽 다중 날씨 카드 -->
+        <!-- 1-B. 헤더 메인: 좌측 동네 엠블럼 + 중앙 레트로 시계 + 우측 다중 날씨 카드 -->
         <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-2 px-3 sm:px-4 pb-2 pt-0.5 min-h-0">
 
-            <!-- 왼쪽 묶음: 동네 엠블럼 + 대형 레트로 시계 -->
+            <!-- 좌측 묶음: 동네 배지/엠블럼 + 대형 레트로 시계 -->
             <div class="flex items-center gap-3 sm:gap-5 shrink-0 w-full lg:w-auto justify-between lg:justify-start">
-                <!-- 동네 이름 + 귀여운 몬스터볼 스타일 엠블럼 -->
+                <!-- 동네 이름 & 귀여운 원형 엠블럼 -->
                 <div class="flex flex-col items-center shrink-0">
                     <span class="text-[11px] sm:text-xs font-extrabold text-[#1e3a5f] tracking-tight leading-tight">경기도 시흥시 목감동</span>
                     <span class="mt-0.5 px-2 py-0.5 rounded-md bg-[#facc15] ink-border text-[10px] font-extrabold text-[#2b3a4a] leading-none">우리집 월드</span>
-                    <!-- 빨강/하양 원형 엠블럼 SVG -->
                     <svg class="w-10 h-10 sm:w-11 sm:h-11 mt-1 drop-shadow-xs" viewBox="0 0 64 64" fill="none">
                         <circle cx="32" cy="32" r="28" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5"/>
                         <path d="M4 32A28 28 0 0 1 60 32Z" fill="#ef4444" stroke="#2b3a4a" stroke-width="3.5"/>
@@ -244,7 +254,7 @@
                     </svg>
                 </div>
 
-                <!-- 중앙-왼쪽: 날짜 + 레트로 블록 시계 -->
+                <!-- 중앙-왼쪽: 큰 날짜(월/일/요일) + 레트로 픽셀 디지털 시계 -->
                 <div class="flex flex-col items-center lg:items-start leading-none">
                     <div id="clock-date" class="date-stroke font-display text-lg sm:text-xl xl:text-2xl tracking-wide mb-0.5 pl-4">
                         11월 20일 금요일
@@ -260,18 +270,17 @@
                 </div>
             </div>
 
-            <!-- 오른쪽: 흰색 라운드 다중 패널 날씨 카드 -->
+            <!-- 우측: 둥근 흰색 다중 패널 날씨 카드 (Open-Meteo + Air Quality) -->
             <div class="w-full lg:w-[54%] xl:w-[53%] bg-white ink-border rounded-[16px] px-2.5 py-2 shadow-sm flex flex-col justify-between gap-1.5">
-                <!-- 상단 행: 미세먼지 세로 알약 + 현재 날씨 + 4개 예보 미니 컬럼 -->
                 <div class="flex items-stretch gap-2">
-                    <!-- 1) 미세먼지 세로 배지 -->
+                    <!-- 1) 미세먼지 등급 세로 배지 -->
                     <div id="dust-pill" class="w-14 sm:w-16 shrink-0 rounded-xl bg-[#2eb85c] text-white flex flex-col items-center justify-center py-1 px-1 text-center">
                         <span class="text-[10px] font-bold leading-none opacity-95">미세먼지</span>
                         <span id="dust-face" class="text-xl sm:text-2xl leading-none my-0.5">😊</span>
                         <span id="dust-grade" class="text-xs sm:text-sm font-black leading-none">보통</span>
                     </div>
 
-                    <!-- 2) 현재 날씨 & 기온 & 미세먼지 수치 -->
+                    <!-- 2) 현재 기온, 날씨, 최고/최저, 미세/초미세 수치 -->
                     <div class="flex items-center gap-2 shrink-0 pr-1">
                         <div class="flex items-center gap-1">
                             <span id="w-now-icon" class="text-3xl sm:text-4xl leading-none">⛅</span>
@@ -284,9 +293,8 @@
                         </div>
                     </div>
 
-                    <!-- 3) 오른쪽 4개 예보 미니 컬럼 (오늘 8시/12시/16시 + 내일) -->
+                    <!-- 3) 오른쪽 4개 예보 컬럼 (8시, 12시, 16시, 내일) -->
                     <div id="forecast-cols" class="flex-1 grid grid-cols-4 gap-1 min-w-0">
-                        <!-- JS로 동적 채움 -->
                         <div class="bg-[#f4f7fb] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-[#64748b]">8시</span>
                             <span class="text-base leading-none my-0.5">⛅</span>
@@ -314,10 +322,10 @@
                     </div>
                 </div>
 
-                <!-- 하단 행: '나갈 때' 실용 옷차림/우산 팁 -->
+                <!-- 하단 행: '나갈 때' 옷차림·우산 팁 -->
                 <div class="flex items-center gap-1.5 border-t border-[#e2e8f0] pt-1 text-xs sm:text-[13px] leading-tight truncate">
                     <span class="font-black text-[#e11d48] shrink-0">나갈 때</span>
-                    <span id="w-outing-tip" class="font-bold text-[#334155] truncate">시흥시 목감동 날씨를 확인하고 있어요...</span>
+                    <span id="w-outing-tip" class="font-bold text-[#334155] truncate">경기도 시흥시 목감동 날씨를 불러오고 있어요...</span>
                 </div>
             </div>
         </div>
@@ -327,16 +335,17 @@
     </header>
 
     <!-- =====================================================================
-         2. 중간 카운트다운 & 진행률 배너 (약 16% 높이)
+         2. 중단 카운트다운 & 진행률 바 (출발 시각 클릭 시 설정 모달 오픈)
     ====================================================================== -->
     <section class="w-full px-3.5 pt-2.5 pb-2 shrink-0 lg:h-[16vh] flex items-center">
         <div class="w-full h-full bg-white ink-border rounded-[18px] px-4 sm:px-5 py-2 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
 
-            <!-- 왼쪽: 출발까지 남은 시간 (터치하면 출발시간/라벨 수정 모달 오픈) -->
-            <button id="btn-departure-area" type="button" title="터치하여 출발 시간 수정"
-                class="text-left shrink-0 hover:opacity-80 transition active:scale-98">
-                <div id="departure-label" class="text-sm sm:text-base font-extrabold text-[#475569] leading-tight">
-                    유치원 출발까지
+            <!-- 왼쪽: 출발 카운트다운 (터치하여 출발 시각/문구 수정) -->
+            <button id="btn-departure-area" type="button" title="터치하여 출발 시각 및 문구 수정"
+                class="text-left shrink-0 hover:opacity-80 transition active:scale-[0.98] group">
+                <div class="flex items-center gap-1.5">
+                    <span id="departure-label" class="text-sm sm:text-base font-extrabold text-[#475569] leading-tight">유치원 출발까지</span>
+                    <span class="text-xs text-[#94a3b8] group-hover:text-[#2b3a4a]">✏️</span>
                 </div>
                 <div id="countdown-main" class="text-2xl sm:text-3xl xl:text-[2.1rem] font-black text-[#2b3a4a] leading-tight tracking-tight">
                     <span id="countdown-highlight" class="text-[#2f9e44]">40분</span>
@@ -344,26 +353,22 @@
                 </div>
             </button>
 
-            <!-- 중앙: 긴 알약 진행 바 + 노란 마스코트 + 말풍선 + 출발 시각 -->
+            <!-- 중앙: 초록 진행 바 + 노란 마스코트 + 말풍선 + 출발 시각 -->
             <div class="flex-1 w-full flex flex-col justify-center min-w-0 px-1 sm:px-3">
                 <div class="relative w-full h-8 sm:h-9 bg-[#f4f1e6] ink-border rounded-full flex items-center">
                     <!-- 초록색 진행률 채움 -->
-                    <div id="progress-fill" class="h-full bg-[#34a853] rounded-l-full transition-all duration-500 ease-out" style="width: 30%;"></div>
+                    <div id="progress-fill" class="h-full bg-[#34a853] rounded-l-full transition-all duration-500 ease-out" style="width: 25%;"></div>
 
-                    <!-- 진행 바 끝부분에 서 있는 귀여운 오리지널 노란 마스코트 SVG -->
-                    <div id="mascot-anchor" class="absolute top-1/2 -translate-y-[58%] -translate-x-1/2 transition-all duration-500 ease-out z-20 pointer-events-none" style="left: 30%;">
+                    <!-- 진행 위치에 맞춰 움직이는 귀여운 노란 마스코트 SVG -->
+                    <div id="mascot-anchor" class="absolute top-1/2 -translate-y-[58%] -translate-x-1/2 transition-all duration-500 ease-out z-20 pointer-events-none" style="left: 25%;">
                         <svg class="w-11 h-11 sm:w-12 sm:h-12 mascot-hop drop-shadow-xs" viewBox="0 0 64 64" fill="none">
-                            <!-- 귀 -->
                             <path d="M19 22 L12 6 L26 16 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
                             <path d="M12 6 L16 11 L19 9 Z" fill="#2b3a4a"/>
                             <path d="M43 22 L50 6 L36 16 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
                             <path d="M50 6 L46 11 L43 9 Z" fill="#2b3a4a"/>
-                            <!-- 번개 꼬리 -->
                             <path d="M16 44 L6 36 L12 32 L4 24 L15 28 L12 35 L20 40 Z" fill="#facc15" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
-                            <!-- 몸통 + 얼굴 -->
                             <ellipse cx="32" cy="41" rx="14" ry="15" fill="#fde047" stroke="#2b3a4a" stroke-width="2.5"/>
                             <circle cx="32" cy="27" r="14" fill="#fde047" stroke="#2b3a4a" stroke-width="2.5"/>
-                            <!-- 눈, 볼터치, 입 -->
                             <circle cx="26.5" cy="26" r="2.3" fill="#2b3a4a"/>
                             <circle cx="27.2" cy="25.2" r="0.8" fill="#ffffff"/>
                             <circle cx="37.5" cy="26" r="2.3" fill="#2b3a4a"/>
@@ -371,40 +376,34 @@
                             <circle cx="22.5" cy="30.5" r="3" fill="#fb7185"/>
                             <circle cx="41.5" cy="30.5" r="3" fill="#fb7185"/>
                             <path d="M29.5 30 Q32 32.5 34.5 30" stroke="#2b3a4a" stroke-width="2" stroke-linecap="round"/>
-                            <!-- 발 -->
                             <ellipse cx="26" cy="56" rx="4.5" ry="2.5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
                             <ellipse cx="38" cy="56" rx="4.5" ry="2.5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
                         </svg>
                     </div>
 
                     <!-- 말풍선 배지 -->
-                    <div class="absolute left-1/2 -translate-x-1/2 bg-white ink-border rounded-full px-4 py-1 shadow-xs z-10 max-w-[72%] truncate">
+                    <div class="absolute left-1/2 -translate-x-1/2 bg-white ink-border rounded-full px-4 py-1 shadow-xs z-10 max-w-[74%] truncate">
                         <span id="speech-bubble-text" class="text-xs sm:text-sm xl:text-base font-black text-[#2b3a4a]">우리 같이 준비하자!</span>
                     </div>
                 </div>
 
-                <!-- 진행 바 오른쪽 아래 출발 시각 표시 -->
-                <div class="flex justify-end mt-0.5 pr-1">
-                    <span id="departure-time-text" class="text-[11px] sm:text-xs font-extrabold text-[#475569]">출발 오전 8:50</span>
+                <!-- 진행 바 아래: 출발 시각 + 시트 동기화 안내 -->
+                <div class="flex items-center justify-between mt-0.5 px-1">
+                    <span id="sheet-sub-status" class="text-[11px] font-bold text-[#64748b] truncate">구글 시트 5분마다 자동 동기화</span>
+                    <span id="departure-time-text" class="text-[11px] sm:text-xs font-extrabold text-[#475569] shrink-0">출발 오전 8:50</span>
                 </div>
             </div>
 
-            <!-- 오른쪽: 귀여운 유치원/학교 건물 SVG -->
+            <!-- 오른쪽: 귀여운 유치원 건물 SVG -->
             <div class="shrink-0 hidden sm:flex items-center justify-center">
                 <svg class="w-12 h-12 sm:w-14 sm:h-14" viewBox="0 0 64 64" fill="none">
-                    <!-- 깃발 -->
                     <line x1="32" y1="6" x2="32" y2="16" stroke="#2b3a4a" stroke-width="2.5" stroke-linecap="round"/>
                     <path d="M32 7 L43 10.5 L32 14 Z" fill="#ef4444" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
-                    <!-- 건물 본체 -->
                     <rect x="10" y="28" width="44" height="28" rx="2" fill="#fef3c7" stroke="#2b3a4a" stroke-width="2.5"/>
-                    <!-- 지붕 -->
                     <path d="M6 28 L58 28 L52 18 L12 18 Z" fill="#f97316" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
-                    <!-- 중앙 시계탑 -->
                     <path d="M22 28 L32 15 L42 28 Z" fill="#fb923c" stroke="#2b3a4a" stroke-width="2.5" stroke-linejoin="round"/>
                     <circle cx="32" cy="24" r="3.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
-                    <!-- 현관문 -->
                     <rect x="27" y="42" width="10" height="14" rx="1.5" fill="#92400e" stroke="#2b3a4a" stroke-width="2"/>
-                    <!-- 창문 -->
                     <rect x="14" y="34" width="8" height="7" rx="1" fill="#bae6fd" stroke="#2b3a4a" stroke-width="1.8"/>
                     <rect x="42" y="34" width="8" height="7" rx="1" fill="#bae6fd" stroke="#2b3a4a" stroke-width="1.8"/>
                     <rect x="14" y="45" width="8" height="7" rx="1" fill="#bae6fd" stroke="#2b3a4a" stroke-width="1.8"/>
@@ -415,80 +414,60 @@
     </section>
 
     <!-- =====================================================================
-         3. 하단 4개 대형 일러스트 할 일 체크리스트 카드 (약 57% 높이)
+         3. 하단 할 일 카드 그리드 (구글 시트 연동, 4열 기준 반응형)
     ====================================================================== -->
-    <main class="flex-1 w-full px-3.5 pb-3.5 pt-1 min-h-0">
-        <div id="task-grid" class="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <!-- JS가 4개의 대형 일러스트 카드를 렌더링합니다 -->
+    <main class="flex-1 w-full px-3.5 pb-3.5 pt-1 min-h-0 overflow-y-auto">
+        <div id="task-grid" class="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 auto-rows-fr">
+            <!-- JS가 구글 시트(또는 캐시/폴백)의 할 일 카드를 렌더링합니다 -->
         </div>
     </main>
 
     <!-- =====================================================================
-         4. 할 일 및 출발 시간 수정 모달 (alert/prompt 미사용)
+         4. 출발 시각/문구 설정 및 체크 초기화 모달 (alert/confirm 미사용)
     ====================================================================== -->
-    <div id="editor-modal" class="hidden fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] items-center justify-center p-4">
-        <div class="bg-[#fcfdf9] ink-border rounded-[20px] shadow-2xl w-full max-w-lg p-5">
+    <div id="settings-modal" class="hidden fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] items-center justify-center p-4">
+        <div class="bg-[#fcfdf9] ink-border rounded-[20px] shadow-2xl w-full max-w-md p-5">
             <div class="flex items-center justify-between border-b border-[#cbd5e1] pb-3 mb-4">
-                <h2 class="font-display text-2xl text-[#2b3a4a]">✏️ 우리집 보드 설정</h2>
-                <button id="btn-close-editor" type="button" class="w-8 h-8 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] font-black text-[#2b3a4a]">✕</button>
+                <h2 class="font-display text-2xl text-[#2b3a4a]">⏰ 출발 시간 & 보드 설정</h2>
+                <button id="btn-close-settings" type="button" class="w-8 h-8 rounded-full bg-[#e2e8f0] hover:bg-[#cbd5e1] font-black text-[#2b3a4a]">✕</button>
             </div>
 
-            <div class="space-y-3 max-h-[65vh] overflow-y-auto pr-1">
-                <!-- 아이 이름 & 출발 라벨 & 출발 시간 -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-[#f0f9ff] p-3 rounded-xl ink-border">
+            <div class="space-y-3">
+                <div class="bg-[#f0f9ff] p-3.5 rounded-xl ink-border space-y-2.5">
                     <div>
-                        <label class="block text-xs font-extrabold text-[#475569] mb-1">아이 이름/호칭</label>
-                        <input id="input-child-name" type="text" maxlength="10" placeholder="우리"
-                            class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
+                        <label class="block text-xs font-extrabold text-[#475569] mb-1">응원 말풍선 호칭 (예: 우리, 민수, 가족)</label>
+                        <input id="input-child-name" type="text" maxlength="12" placeholder="우리"
+                            class="w-full bg-white ink-border rounded-lg px-3 py-2 text-sm font-bold">
                     </div>
                     <div>
                         <label class="block text-xs font-extrabold text-[#475569] mb-1">출발 안내 문구</label>
-                        <input id="input-dep-label" type="text" maxlength="16" placeholder="유치원 출발까지"
-                            class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
+                        <input id="input-dep-label" type="text" maxlength="18" placeholder="유치원 출발까지"
+                            class="w-full bg-white ink-border rounded-lg px-3 py-2 text-sm font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-extrabold text-[#475569] mb-1">출발 시각</label>
+                        <label class="block text-xs font-extrabold text-[#475569] mb-1">목표 출발 시각</label>
                         <input id="input-dep-time" type="time"
-                            class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
+                            class="w-full bg-white ink-border rounded-lg px-3 py-2 text-sm font-bold">
                     </div>
                 </div>
 
-                <!-- 4개 할 일 이름 수정 -->
-                <div class="bg-[#fefce8] p-3 rounded-xl ink-border space-y-2">
-                    <div class="text-xs font-extrabold text-[#854d0e]">4가지 할 일 이름 (체크는 매일 아침 7시에 자동 초기화)</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-6 h-6 rounded-full bg-white ink-border text-xs font-black flex items-center justify-center shrink-0">1</span>
-                            <input id="input-task-0" type="text" maxlength="14" class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-6 h-6 rounded-full bg-white ink-border text-xs font-black flex items-center justify-center shrink-0">2</span>
-                            <input id="input-task-1" type="text" maxlength="14" class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-6 h-6 rounded-full bg-white ink-border text-xs font-black flex items-center justify-center shrink-0">3</span>
-                            <input id="input-task-2" type="text" maxlength="14" class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-6 h-6 rounded-full bg-white ink-border text-xs font-black flex items-center justify-center shrink-0">4</span>
-                            <input id="input-task-3" type="text" maxlength="14" class="w-full bg-white ink-border rounded-lg px-2.5 py-1.5 text-sm font-bold">
-                        </div>
-                    </div>
+                <div class="bg-[#fefce8] p-3 rounded-xl ink-border text-xs font-bold text-[#854d0e] leading-relaxed">
+                    📋 할 일 목록은 연결된 <b>구글 시트</b>에서 5분마다 자동으로 불러옵니다.<br>
+                    체크 표시 상태는 이 기기에 저장되며 <b>매일 아침 7시</b>에 자동으로 풀립니다.
                 </div>
             </div>
 
-            <!-- 하단 액션 버튼 -->
             <div class="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-[#cbd5e1]">
                 <button id="btn-reset-checks" type="button"
                     class="bg-[#fee2e2] hover:bg-[#fecaca] text-[#991b1b] ink-border rounded-xl px-3.5 py-2 text-sm font-extrabold transition active:scale-95">
                     오늘 체크 모두 풀기
                 </button>
                 <div class="flex items-center gap-2">
-                    <button id="btn-cancel-editor" type="button"
+                    <button id="btn-cancel-settings" type="button"
                         class="bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#2b3a4a] ink-border rounded-xl px-4 py-2 text-sm font-extrabold transition active:scale-95">
                         취소
                     </button>
-                    <button id="btn-save-editor" type="button"
+                    <button id="btn-save-settings" type="button"
                         class="bg-[#34a853] hover:bg-[#2b8a44] text-white ink-border rounded-xl px-5 py-2 text-sm font-extrabold transition active:scale-95">
                         저장하기
                     </button>
@@ -498,7 +477,7 @@
     </div>
 
     <!-- =====================================================================
-         5. 밤 10시~아침 7시 야간 암전 오버레이 (#000000 완전 검정)
+         5. 밤 10시(22:00) ~ 아침 7시(06:59) 야간 암전 오버레이 (#000000)
     ====================================================================== -->
     <div id="night-overlay" class="hidden fixed inset-0 z-50 bg-[#000000] flex-col items-center justify-end pb-8 cursor-pointer">
         <p id="night-hint" class="text-[#1a1a1a] text-sm font-bold tracking-wide select-none">
@@ -508,7 +487,7 @@
 
     <script>
         /* =========================================================================
-           1. 동적 PWA Web App Manifest 주입 (홈 화면 추가 시 전체 화면 실행)
+           1. 동적 PWA Web App Manifest 주입 (홈 화면 추가 시 전체 화면 가로 모드)
         ========================================================================= */
         (function injectManifest() {
             const manifestObj = {
@@ -535,223 +514,535 @@
         })();
 
         /* =========================================================================
-           2. 상태, 기본값 및 localStorage 키 정의
+           2. 상수, 구글 시트 CSV 주소, LocalStorage 키, 상태 정의
         ========================================================================= */
-        const STORAGE_KEY = 'mokgam_pokemon_style_dashboard_v2';
-        const MOKGAM_COORDS = { lat: 37.3814, lon: 126.8617 };
+        const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh3u5mxfBwnGCDlZZh1zCfZI3kjSP0Mlb3d64umKM7HrfNyhQRxNEpsVmbm7JcRwn_RdI16lIEPjmF/pub?output=csv';
+        const MOKGAM_COORDS = { lat: 37.3837, lon: 126.8617 };
 
-        const DEFAULT_STATE = {
-            dateKey: '',
-            childName: '우리',
-            departureLabel: '유치원 출발까지',
-            departureTime: '08:50',
-            tasks: [
-                { id: 0, title: '아침 먹기', done: false },
-                { id: 1, title: '세수·양치', done: false },
-                { id: 2, title: '옷 입기', done: false },
-                { id: 3, title: '가방 챙기기', done: false }
-            ]
+        const STORAGE_KEYS = {
+            SETTINGS: 'mokgam_dashboard_settings_v3',
+            SHEET_CACHE: 'mokgam_dashboard_sheet_cache_v3',
+            CHECK_STATE: 'mokgam_dashboard_check_state_v3'
         };
 
-        let appState = structuredClone(DEFAULT_STATE);
-        let wakeLockSentinel = null;
+        // 최초 접속 시 시트도 못 읽고 저장된 캐시도 없을 때만 쓰는 기본 예시 4개
+        const DEFAULT_FALLBACK_TASKS = [
+            { task: '아침 먹기', who: '아이' },
+            { task: '세수·양치', who: '아이' },
+            { task: '옷 입기', who: '아이' },
+            { task: '가방 챙기기', who: '아이' }
+        ];
 
-        // 야간 모드 상태
+        let settings = {
+            childName: '우리',
+            departureLabel: '유치원 출발까지',
+            departureTime: '08:50'
+        };
+
+        // 현재 표시 중인 전체 할 일 목록: [{ task: string, who: string }]
+        let sheetTasks = [];
+
+        // 체크 상태: { dateKey: 'YYYY-MM-DD', checkedMap: { 'task||who': true } }
+        let checkState = {
+            dateKey: '',
+            checkedMap: {}
+        };
+
+        // 현재 선택된 담당자 필터 ('ALL' 또는 특정 이름)
+        let activeMemberFilter = 'ALL';
+
+        // 시트 동기화 상태
+        let syncMeta = {
+            source: 'loading', // 'live' | 'cache' | 'fallback'
+            lastSyncText: ''
+        };
+
+        // Wake Lock & 야간 암전 상태
+        let wakeLockSentinel = null;
         let isNightPreview = false;
         let isPeeking = false;
         let peekSeconds = 0;
         let peekTimerId = null;
 
         /* =========================================================================
-           3. 귀여운 한국 어린이 동화풍 플랫 일러스트 SVG (4종 + 픽셀 초록 공룡)
+           3. 귀여운 동화풍 인라인 SVG 일러스트 라이브러리 (키워드별 자동 매칭)
         ========================================================================= */
         const COMPANION_DINO_SVG = `
-            <svg class="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-xs" viewBox="0 0 64 64" fill="none">
-                <!-- 등 위 새싹 씨앗 -->
+            <svg class="w-11 h-11 sm:w-12 sm:h-12 drop-shadow-xs shrink-0" viewBox="0 0 64 64" fill="none">
                 <path d="M22 24 C20 12 34 6 44 14 C50 18 48 28 42 30 Z" fill="#4ade80" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
                 <path d="M32 10 L35 20" stroke="#166534" stroke-width="2.2" stroke-linecap="round"/>
-                <!-- 몸통과 얼굴 -->
                 <rect x="14" y="24" width="34" height="24" rx="10" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.6"/>
-                <!-- 귀 -->
                 <path d="M18 24 L15 17 L23 22 Z" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
                 <path d="M35 24 L39 17 L41 24 Z" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
-                <!-- 눈 -->
                 <rect x="18" y="30" width="5" height="6" rx="1.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
                 <rect x="20" y="32" width="2.5" height="3" fill="#dc2626"/>
                 <rect x="29" y="30" width="5" height="6" rx="1.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
                 <rect x="31" y="32" width="2.5" height="3" fill="#dc2626"/>
-                <!-- 웃는 입 -->
                 <path d="M20 40 Q26 44 33 40" stroke="#2b3a4a" stroke-width="2.2" stroke-linecap="round"/>
-                <!-- 다리 -->
                 <rect x="16" y="46" width="8" height="10" rx="3" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.4"/>
                 <rect x="28" y="46" width="8" height="10" rx="3" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.4"/>
                 <rect x="40" y="46" width="8" height="10" rx="3" fill="#6ee7b7" stroke="#2b3a4a" stroke-width="2.4"/>
             </svg>
         `;
 
-        const TASK_ILLUSTRATIONS = [
-            // 1. 아침 먹기 (식탁에 앉아 숟가락으로 밥 먹는 귀여운 아이)
-            `
-            <svg class="w-full h-full max-w-[185px] max-h-[185px]" viewBox="0 0 200 200" fill="none">
-                <!-- 머리 뒤쪽 단발 -->
+        const ILLUSTRATIONS = {
+            // 밥 / 아침 / 점심 / 저녁 / 먹기 / 간식
+            eat: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
                 <path d="M62 66 C60 32 140 32 138 66 L142 96 C142 104 134 108 128 106 L72 106 C66 108 58 104 58 96 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 얼굴 -->
                 <circle cx="100" cy="75" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <!-- 앞머리 -->
                 <path d="M70 68 C75 44 125 44 130 68 C122 58 110 64 100 58 C90 64 78 58 70 68 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 꽃 머리핀 -->
                 <circle cx="77" cy="60" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <circle cx="77" cy="60" r="1.8" fill="#f97316"/>
-                <!-- 행복한 감은 눈 & 볼터치 & 오물오물 입 -->
                 <path d="M84 76 Q89 72 94 76" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
                 <path d="M106 76 Q111 72 116 76" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
                 <ellipse cx="81" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <ellipse cx="119" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <path d="M95 86 Q100 91 105 86" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
-                <!-- 몸통 (노란 티셔츠) -->
                 <path d="M76 105 L124 105 L130 132 L70 132 Z" fill="#fef08a" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 숟가락 든 팔 -->
                 <path d="M74 114 Q62 110 66 96 L78 96" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 <line x1="65" y1="95" x2="88" y2="90" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round"/>
                 <ellipse cx="90" cy="89" rx="7" ry="4.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5"/>
-                <!-- 의자 다리 & 아이 다리 -->
                 <rect x="82" y="156" width="12" height="26" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="106" y="156" width="12" height="26" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
-                <rect x="80" y="176" width="16" height="8" rx="4" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.8"/>
-                <rect x="104" y="176" width="16" height="8" rx="4" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.8"/>
-                <!-- 나무 식탁 -->
                 <rect x="34" y="128" width="132" height="14" rx="5" fill="#d4a373" stroke="#2b3a4a" stroke-width="3.2"/>
                 <rect x="44" y="142" width="10" height="40" rx="2" fill="#bc8a5f" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="146" y="142" width="10" height="40" rx="2" fill="#bc8a5f" stroke="#2b3a4a" stroke-width="3"/>
-                <!-- 밥그릇 (오른쪽) -->
                 <path d="M110 128 C110 116 138 116 138 128 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.6"/>
                 <path d="M108 128 L140 128 L135 138 L113 138 Z" fill="#93c5fd" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
-                <!-- 국그릇 (왼쪽) -->
                 <path d="M56 128 L88 128 L83 138 L61 138 Z" fill="#fb923c" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
-                <!-- 반찬 접시 (가운데) -->
                 <ellipse cx="99" cy="133" rx="11" ry="5" fill="#fca5a5" stroke="#2b3a4a" stroke-width="2.4"/>
-                <!-- 김 모락모락 -->
-                <path d="M68 114 Q65 110 68 106" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
-                <path d="M76 114 Q73 110 76 106" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            `,
-            // 2. 세수·양치 (세면대 앞에서 치카치카 양치하는 아이)
-            `
-            <svg class="w-full h-full max-w-[185px] max-h-[185px]" viewBox="0 0 200 200" fill="none">
-                <!-- 반짝이 -->
+            </svg>`,
+
+            // 세수 / 양치 / 치카 / 씻기 / 샤워 / 목욕
+            wash: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
                 <path d="M46 86 L49 78 L52 86 L60 89 L52 92 L49 100 L46 92 L38 89 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
                 <circle cx="152" cy="76" r="5" fill="#bae6fd" stroke="#2b3a4a" stroke-width="2"/>
                 <circle cx="162" cy="92" r="3.5" fill="#bae6fd" stroke="#2b3a4a" stroke-width="1.8"/>
-                <!-- 머리 뒤쪽 -->
                 <path d="M62 66 C60 32 140 32 138 66 L142 96 C142 104 134 108 128 106 L72 106 C66 108 58 104 58 96 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 얼굴 -->
                 <circle cx="100" cy="75" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <!-- 앞머리 -->
                 <path d="M70 68 C75 44 125 44 130 68 C122 58 110 64 100 58 C90 64 78 58 70 68 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 꽃 머리핀 -->
                 <circle cx="77" cy="60" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <!-- 눈 & 볼 -->
                 <circle cx="88" cy="75" r="3.2" fill="#2b3a4a"/>
                 <circle cx="112" cy="75" r="3.2" fill="#2b3a4a"/>
                 <ellipse cx="81" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <ellipse cx="119" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <!-- 치카치카 입 + 거품 -->
                 <rect x="92" y="84" width="16" height="8" rx="4" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.4"/>
                 <circle cx="91" cy="89" r="3.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
-                <!-- 몸통 (분홍 파자마) -->
                 <path d="M74 105 L126 105 L132 142 L68 142 Z" fill="#fbcfe8" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 칫솔 든 오른손 -->
                 <path d="M74 114 Q58 106 68 92 L82 90" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
                 <line x1="64" y1="88" x2="100" y2="87" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round"/>
-                <!-- 양치컵 든 왼손 -->
                 <rect x="116" y="106" width="16" height="20" rx="3" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.6"/>
-                <!-- 세면대 대야 -->
                 <ellipse cx="96" cy="146" rx="44" ry="12" fill="#e0f2fe" stroke="#2b3a4a" stroke-width="3.2"/>
                 <path d="M52 146 L62 174 C76 182 116 182 130 174 L140 146 Z" fill="#93c5fd" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 바닥 치약 -->
                 <path d="M138 172 L158 166 L161 175 L140 179 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
-                <rect x="134" y="173" width="5" height="6" rx="1" fill="#38bdf8" stroke="#2b3a4a" stroke-width="2"/>
-            </svg>
-            `,
-            // 3. 옷 입기 (노란 티셔츠를 스스로 입는 아이와 바닥에 개켜진 옷)
-            `
-            <svg class="w-full h-full max-w-[185px] max-h-[185px]" viewBox="0 0 200 200" fill="none">
-                <!-- 머리 뒤쪽 -->
+            </svg>`,
+
+            // 옷 / 입기 / 갈아입기 / 외투 / 양말
+            dress: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
                 <path d="M62 60 C60 26 140 26 138 60 L142 90 C142 98 134 102 128 100 L72 100 C66 102 58 98 58 90 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 얼굴 -->
                 <circle cx="100" cy="69" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <!-- 앞머리 -->
                 <path d="M70 62 C75 38 125 38 130 62 C122 52 110 58 100 52 C90 58 78 52 70 62 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 꽃 머리핀 -->
                 <circle cx="77" cy="54" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <!-- 눈, 볼, 웃는 입 -->
                 <circle cx="88" cy="69" r="3.2" fill="#2b3a4a"/>
                 <circle cx="112" cy="69" r="3.2" fill="#2b3a4a"/>
                 <ellipse cx="81" cy="77" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <ellipse cx="119" cy="77" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <path d="M94 80 Q100 86 106 80" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
-                <!-- 다리 & 양말 -->
                 <rect x="84" y="144" width="12" height="32" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="104" y="144" width="12" height="32" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
-                <!-- 남색 반바지 -->
                 <path d="M78 132 L122 132 L124 152 L102 152 L100 144 L98 152 L76 152 Z" fill="#1e3a5f" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 노란 티셔츠 (소매에 팔 넣는 포즈) -->
                 <path d="M76 99 L124 99 L146 112 L138 126 L122 118 L122 136 L78 136 L78 118 L64 126 L56 112 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 티셔츠 위 귀여운 곰돌이 아이콘 -->
                 <circle cx="100" cy="117" r="6" fill="#f59e0b" stroke="#2b3a4a" stroke-width="2"/>
-                <!-- 소매 밖으로 나온 손 -->
                 <circle cx="146" cy="120" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
                 <circle cx="58" cy="120" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
-                <!-- 바닥에 놓인 옷가지들 -->
                 <path d="M36 164 L64 156 L72 174 L44 180 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
                 <path d="M132 162 L160 158 L166 178 L138 180 Z" fill="#334155" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
-            </svg>
-            `,
-            // 4. 가방 챙기기 (노란 책가방 메고 신나게 손 흔드는 아이)
-            `
-            <svg class="w-full h-full max-w-[185px] max-h-[185px]" viewBox="0 0 200 200" fill="none">
-                <!-- 반짝이 장식 -->
+            </svg>`,
+
+            // 가방 / 챙기기 / 등원 / 준비물 / 학교 / 유치원
+            bag: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
                 <path d="M46 112 L49 104 L52 112 L60 115 L52 118 L49 126 L46 118 L38 115 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
                 <path d="M150 60 L152 54 L154 60 L160 62 L154 64 L152 70 L150 64 L144 62 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
-                <!-- 노란 유치원 백팩 (등 뒤) -->
                 <rect x="108" y="96" width="34" height="44" rx="12" fill="#facc15" stroke="#2b3a4a" stroke-width="3.2"/>
                 <rect x="116" y="114" width="20" height="18" rx="6" fill="#fef08a" stroke="#2b3a4a" stroke-width="2.4"/>
-                <!-- 머리 뒤쪽 -->
                 <path d="M62 60 C60 26 140 26 138 60 L142 90 C142 98 134 102 128 100 L72 100 C66 102 58 98 58 90 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 얼굴 -->
                 <circle cx="100" cy="69" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <!-- 앞머리 -->
                 <path d="M70 62 C75 38 125 38 130 62 C122 52 110 58 100 52 C90 58 78 52 70 62 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 꽃 머리핀 -->
                 <circle cx="77" cy="54" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <!-- 환하게 웃는 표정 -->
                 <circle cx="88" cy="68" r="3.2" fill="#2b3a4a"/>
                 <circle cx="112" cy="68" r="3.2" fill="#2b3a4a"/>
                 <ellipse cx="81" cy="76" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <ellipse cx="119" cy="76" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
                 <path d="M92 78 C92 87 108 87 108 78 Z" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
-                <!-- 높이 든 오른팔(손 흔들기) -->
                 <path d="M120 108 Q144 96 148 76" stroke="#ffe1cc" stroke-width="11" stroke-linecap="round"/>
                 <path d="M120 108 Q144 96 148 76" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
                 <circle cx="149" cy="73" r="7" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
-                <!-- 다리 & 신발 -->
                 <rect x="84" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="104" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="80" y="170" width="18" height="10" rx="5" fill="#f43f5e" stroke="#2b3a4a" stroke-width="2.8"/>
                 <rect x="102" y="170" width="18" height="10" rx="5" fill="#f43f5e" stroke="#2b3a4a" stroke-width="2.8"/>
-                <!-- 남색 반바지 -->
                 <path d="M78 134 L122 134 L124 154 L102 154 L100 146 L98 154 L76 154 Z" fill="#1e3a5f" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- 노란 유치원복 상의 -->
                 <path d="M76 99 L124 99 L124 136 L76 136 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 가방 어깨끈 -->
                 <path d="M84 99 L84 132" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
                 <path d="M116 99 L116 132" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
-            </svg>
-            `
-        ];
+            </svg>`,
+
+            // 책 / 공부 / 독서 / 숙제 / 한글 / 수학 / 피아노 / 영어
+            study: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="96" r="64" fill="#e0f2fe"/>
+                <!-- 펼쳐진 책 -->
+                <path d="M38 118 Q68 106 100 120 Q132 106 162 118 L156 164 Q128 152 100 164 Q72 152 44 164 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
+                <path d="M34 124 L44 164 Q72 154 100 166 Q128 154 156 164 L166 124" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="100" y1="120" x2="100" y2="164" stroke="#2b3a4a" stroke-width="3"/>
+                <line x1="56" y1="132" x2="86" y2="132" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+                <line x1="58" y1="144" x2="84" y2="144" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+                <line x1="114" y1="132" x2="144" y2="132" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+                <line x1="116" y1="144" x2="142" y2="144" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+                <!-- 큰 노란 연필 -->
+                <g transform="rotate(-24 118 76)">
+                    <rect x="92" y="34" width="22" height="72" rx="4" fill="#facc15" stroke="#2b3a4a" stroke-width="3.2"/>
+                    <rect x="92" y="24" width="22" height="14" rx="4" fill="#fda4af" stroke="#2b3a4a" stroke-width="3.2"/>
+                    <path d="M92 106 L103 128 L114 106 Z" fill="#fde68a" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                    <path d="M99 120 L103 128 L107 120 Z" fill="#2b3a4a"/>
+                </g>
+                <!-- 반짝이 별 -->
+                <path d="M52 54 L56 42 L60 54 L72 58 L60 62 L56 74 L52 62 L40 58 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.2" stroke-linejoin="round"/>
+            </svg>`,
+
+            // 청소 / 정리 / 장난감 / 설거지 / 빨래 / 쓰레기 / 방
+            clean: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="64" fill="#dcfce7"/>
+                <!-- 정리 상자 -->
+                <rect x="46" y="102" width="108" height="62" rx="12" fill="#fbbf24" stroke="#2b3a4a" stroke-width="3.5"/>
+                <rect x="40" y="90" width="120" height="18" rx="6" fill="#f59e0b" stroke="#2b3a4a" stroke-width="3.5"/>
+                <rect x="82" y="118" width="36" height="10" rx="5" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5"/>
+                <!-- 상자 안 장난감/빗자루 -->
+                <circle cx="72" cy="76" r="16" fill="#fb7185" stroke="#2b3a4a" stroke-width="3"/>
+                <rect x="94" y="56" width="24" height="34" rx="5" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3"/>
+                <path d="M126 90 L144 46" stroke="#92400e" stroke-width="6" stroke-linecap="round"/>
+                <!-- 반짝이 -->
+                <path d="M52 48 L55 38 L58 48 L68 51 L58 54 L55 64 L52 54 L42 51 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M154 70 L157 62 L160 70 L168 73 L160 76 L157 84 L154 76 L146 73 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+            </svg>`,
+
+            // 약 / 물 / 비타민 / 영양제 / 우유 / 마시기
+            health: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="64" fill="#e0f2fe"/>
+                <!-- 물컵 -->
+                <path d="M62 72 L124 72 L114 156 C113 162 108 166 102 166 L84 166 C78 166 73 162 72 156 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
+                <path d="M67 104 L119 104 L113 154 C112 159 108 162 102 162 L84 162 C78 162 74 159 73 154 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3"/>
+                <!-- 웃는 표정 -->
+                <circle cx="84" cy="126" r="3" fill="#2b3a4a"/>
+                <circle cx="102" cy="126" r="3" fill="#2b3a4a"/>
+                <path d="M89 133 Q93 138 97 133" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                <!-- 빨대 -->
+                <path d="M104 72 L118 38 L142 38" stroke="#fb7185" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- 비타민/하트 -->
+                <circle cx="146" cy="134" r="18" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2"/>
+                <path d="M138 134 H154 M146 126 V142" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+            </svg>`,
+
+            // 운동 / 산책 / 놀이터 / 줄넘기 / 자전거 / 공원
+            exercise: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="64" fill="#fef3c7"/>
+                <!-- 귀여운 운동화 -->
+                <path d="M44 134 C44 114 66 104 82 92 L106 112 C116 118 134 118 152 126 C160 130 162 142 154 148 L48 148 C44 148 44 142 44 134 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
+                <rect x="44" y="146" width="114" height="14" rx="7" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5"/>
+                <line x1="88" y1="104" x2="96" y2="112" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+                <line x1="98" y1="112" x2="106" y2="120" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+                <!-- 축구공 / 해 -->
+                <circle cx="136" cy="68" r="24" fill="#fb923c" stroke="#2b3a4a" stroke-width="3.2"/>
+                <path d="M114 68 H158 M136 44 V92" stroke="#2b3a4a" stroke-width="2.4"/>
+                <!-- 바람선 -->
+                <path d="M34 86 H64 M42 74 H60" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+            </svg>`,
+
+            // 잠 / 취침 / 이불 / 자장 / 꿈 / 눕기
+            sleep: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="64" fill="#e0e7ff"/>
+                <!-- 노란 초승달 -->
+                <path d="M126 52 C100 50 78 72 78 100 C78 128 100 150 128 148 C142 147 154 140 162 130 C142 134 118 120 116 96 C114 78 120 62 126 52 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
+                <!-- 구름 베개 -->
+                <path d="M44 148 C36 148 32 136 40 130 C38 118 52 110 64 116 C72 106 94 110 96 124 C106 124 110 148 96 148 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <!-- 별 & Zzz -->
+                <path d="M56 66 L59 56 L62 66 L72 69 L62 72 L59 82 L56 72 L46 69 Z" fill="#facc15" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+                <text x="128" y="84" font-family="Jua, sans-serif" font-size="24" font-weight="bold" fill="#4f46e5">Zzz</text>
+            </svg>`,
+
+            // 기본 귀여운 응원 별 마스코트 (매칭 키워드가 없을 때)
+            default: `
+            <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <circle cx="100" cy="100" r="64" fill="#fef9c3"/>
+                <path d="M100 38 L117 74 L156 79 L128 106 L135 145 L100 126 L65 145 L72 106 L44 79 L83 74 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.8" stroke-linejoin="round"/>
+                <circle cx="86" cy="96" r="4" fill="#2b3a4a"/>
+                <circle cx="114" cy="96" r="4" fill="#2b3a4a"/>
+                <ellipse cx="77" cy="104" rx="5.5" ry="3.2" fill="#fb7185" opacity="0.8"/>
+                <ellipse cx="123" cy="104" rx="5.5" ry="3.2" fill="#fb7185" opacity="0.8"/>
+                <path d="M93 107 Q100 114 107 107" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="48" cy="52" r="6" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.2"/>
+                <circle cx="154" cy="54" r="5" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.2"/>
+                <circle cx="152" cy="146" r="6" fill="#4ade80" stroke="#2b3a4a" stroke-width="2.2"/>
+            </svg>`
+        };
+
+        /**
+         * 할 일 제목의 키워드에 맞춰 가장 어울리는 동화풍 SVG 일러스트를 반환합니다.
+         */
+        function getIllustrationForTask(taskTitle) {
+            const t = (taskTitle || '').toLowerCase();
+            if (/아침|밥|점심|저녁|식사|먹기|간식|요리|반찬|도시락/.test(t)) return ILLUSTRATIONS.eat;
+            if (/세수|양치|치카|씻기|샤워|목욕|손씻|이닦/.test(t)) return ILLUSTRATIONS.wash;
+            if (/옷|입기|갈아입|외투|양말|신발|모자|패딩/.test(t)) return ILLUSTRATIONS.dress;
+            if (/가방|챙기|등원|등교|준비물|유치원|학교|어린이집|출발/.test(t)) return ILLUSTRATIONS.bag;
+            if (/책|공부|독서|읽기|숙제|한글|수학|영어|피아노|학습|일기|글씨|미술/.test(t)) return ILLUSTRATIONS.study;
+            if (/청소|정리|장난감|설거지|빨래|쓰레기|방|분리수거|환기|화분/.test(t)) return ILLUSTRATIONS.clean;
+            if (/약|물|비타민|영양제|우유|마시|홍삼|유산균/.test(t)) return ILLUSTRATIONS.health;
+            if (/운동|산책|놀이터|줄넘기|자전거|스트레칭|달리기|축구|태권도|수영/.test(t)) return ILLUSTRATIONS.exercise;
+            if (/잠|취침|이불|자장|수면|꿈|눕기|코자/.test(t)) return ILLUSTRATIONS.sleep;
+            return ILLUSTRATIONS.default;
+        }
+
+        /**
+         * 담당자('누구') 이름별로 아이도 한눈에 구분할 수 있는 컬러 배지 클래스를 반환합니다.
+         */
+        function getWhoBadgeStyle(who) {
+            const name = (who || '가족').trim();
+            if (/엄마|어머니|맘/.test(name)) {
+                return { bg: 'bg-[#ffe4e6]', text: 'text-[#be123c]', border: 'border-[#fb7185]', dot: 'bg-[#f43f5e]' };
+            }
+            if (/아빠|아버지|파파/.test(name)) {
+                return { bg: 'bg-[#dbeafe]', text: 'text-[#1d4ed8]', border: 'border-[#60a5fa]', dot: 'bg-[#3b82f6]' };
+            }
+            if (/가족|모두|함께|우리/.test(name)) {
+                return { bg: 'bg-[#d1fae5]', text: 'text-[#047857]', border: 'border-[#34d399]', dot: 'bg-[#10b981]' };
+            }
+
+            // 아이 이름 등 기타 이름은 문자열 해시로 항상 동일한 밝은 컬러 부여
+            const palette = [
+                { bg: 'bg-[#fef3c7]', text: 'text-[#b45309]', border: 'border-[#fbbf24]', dot: 'bg-[#f59e0b]' },
+                { bg: 'bg-[#f3e8ff]', text: 'text-[#7e22ce]', border: 'border-[#c084fc]', dot: 'bg-[#a855f7]' },
+                { bg: 'bg-[#ffedd5]', text: 'text-[#c2410c]', border: 'border-[#fb923c]', dot: 'bg-[#f97316]' },
+                { bg: 'bg-[#ccfbf1]', text: 'text-[#0f766e]', border: 'border-[#2dd4bf]', dot: 'bg-[#14b8a6]' }
+            ];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = (hash * 31 + name.charCodeAt(i)) % 997;
+            }
+            return palette[Math.abs(hash) % palette.length];
+        }
 
         /* =========================================================================
-           4. 아침 7시 기준 날짜 키 계산 & LocalStorage 저장/복원
+           4. 안전한 CSV 파서 & 구글 시트 동기화 (5분 주기 + 오프라인 캐시 폴백)
+        ========================================================================= */
+        /**
+         * 따옴표("..."), 이스케이프 따옴표(""), 따옴표 내부 쉼표/줄바꿈을 안전하게 파싱합니다.
+         */
+        function parseCSVText(rawText) {
+            const text = (rawText || '').replace(/^\uFEFF/, ''); // UTF-8 BOM 제거
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                const next = text[i + 1];
+
+                if (inQuotes) {
+                    if (ch === '"' && next === '"') {
+                        currentField += '"';
+                        i++; // 이스케이프 따옴표 건너뜀
+                    } else if (ch === '"') {
+                        inQuotes = false;
+                    } else {
+                        currentField += ch;
+                    }
+                } else {
+                    if (ch === '"') {
+                        inQuotes = true;
+                    } else if (ch === ',') {
+                        currentRow.push(currentField.trim());
+                        currentField = '';
+                    } else if (ch === '\r' && next === '\n') {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                        i++;
+                    } else if (ch === '\n' || ch === '\r') {
+                        currentRow.push(currentField.trim());
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    } else {
+                        currentField += ch;
+                    }
+                }
+            }
+
+            if (currentField.length > 0 || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                rows.push(currentRow);
+            }
+
+            return rows;
+        }
+
+        /**
+         * 첫 행이 헤더인지 판별하고, 빈 행을 제거한 [{ task, who }] 배열을 반환합니다.
+         */
+        function extractTasksFromCSV(csvText) {
+            const rows = parseCSVText(csvText)
+                .filter(row => row.some(cell => cell.trim() !== ''));
+
+            if (rows.length === 0) return [];
+
+            const headerTaskPattern = /^(할\s*일|할일|task|tasks|todo|to-do|내용|항목|목록|제목|title)$/i;
+            const headerWhoPattern = /^(누구|담당|담당자|who|이름|name|가족|구성원|사람|assignee)$/i;
+
+            let startIndex = 0;
+            const firstCol0 = (rows[0][0] || '').trim();
+            const firstCol1 = (rows[0][1] || '').trim();
+            if (headerTaskPattern.test(firstCol0) || headerWhoPattern.test(firstCol1)) {
+                startIndex = 1;
+            }
+
+            const tasks = [];
+            for (let i = startIndex; i < rows.length; i++) {
+                const task = (rows[i][0] || '').trim();
+                const who = (rows[i][1] || '').trim() || '가족';
+                if (task) {
+                    tasks.push({ task, who });
+                }
+            }
+            return tasks;
+        }
+
+        function formatHHMM(date = new Date()) {
+            const h = String(date.getHours()).padStart(2, '0');
+            const m = String(date.getMinutes()).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+
+        function updateSyncStatusUI() {
+            const btn = document.getElementById('btn-refresh-sheet');
+            const label = document.getElementById('sheet-sync-label');
+            const sub = document.getElementById('sheet-sub-status');
+
+            if (syncMeta.source === 'live') {
+                btn.className = 'inline-flex items-center gap-1 bg-[#dcfce7] hover:bg-white text-[#166534] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
+                label.textContent = `시트 ${syncMeta.lastSyncText}`;
+                btn.title = `구글 시트 동기화 완료 (${syncMeta.lastSyncText}) · 누르면 다시 불러오기`;
+                sub.textContent = `구글 시트 동기화 완료 (${syncMeta.lastSyncText}) · 5분마다 자동 갱신`;
+            } else if (syncMeta.source === 'cache') {
+                btn.className = 'inline-flex items-center gap-1 bg-[#fef3c7] hover:bg-white text-[#92400e] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
+                label.textContent = '저장된 목록';
+                btn.title = `시트 연결 실패로 마지막 저장 목록(${syncMeta.lastSyncText || '이전'}) 표시 중 · 누르면 재시도`;
+                sub.textContent = `시트 연결 대기 중 — 마지막으로 읽은 목록(${syncMeta.lastSyncText || '저장됨'}) 표시 중`;
+            } else {
+                btn.className = 'inline-flex items-center gap-1 bg-[#fee2e2] hover:bg-white text-[#991b1b] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
+                label.textContent = '기본 목록';
+                btn.title = '시트를 읽지 못해 기본 예시 목록을 표시 중 · 누르면 재시도';
+                sub.textContent = '시트 연결 실패 — 기본 예시 목록 표시 중 (5분마다 재시도)';
+            }
+        }
+
+        function loadCachedSheetTasks() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.SHEET_CACHE);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed.tasks) && parsed.tasks.length > 0) {
+                    return parsed;
+                }
+            } catch (e) {
+                console.error('캐시 로드 실패:', e);
+            }
+            return null;
+        }
+
+        function saveCachedSheetTasks(tasks, timeText) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.SHEET_CACHE, JSON.stringify({
+                    tasks,
+                    savedAt: timeText
+                }));
+            } catch (e) {
+                console.error('캐시 저장 실패:', e);
+            }
+        }
+
+        /**
+         * 구글 시트 CSV를 불러옵니다.
+         * 1차: 캐시 방지 타임스탬프(&_ts=) 포함 요청
+         * 2차: 실패 시 원본 URL로 재시도
+         * 실패 시: localStorage 캐시 -> 없을 때만 기본 예시 4개 폴백
+         */
+        async function fetchSheetTasks(isManual = false) {
+            const icon = document.getElementById('sheet-sync-icon');
+            icon.classList.add('inline-block', 'animate-spin');
+
+            const tsUrl = `${SHEET_CSV_URL}${SHEET_CSV_URL.includes('?') ? '&' : '?'}_ts=${Date.now()}`;
+            let csvText = null;
+
+            try {
+                let res = null;
+                try {
+                    res = await fetch(tsUrl, { cache: 'no-store' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                } catch (firstErr) {
+                    // 타임스탬프 파라미터가 차단되거나 실패 시 원본 URL로 재시도
+                    res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                }
+                csvText = await res.text();
+            } catch (err) {
+                console.warn('구글 시트 CSV 불러오기 실패:', err);
+                csvText = null;
+            }
+
+            const parsedTasks = csvText ? extractTasksFromCSV(csvText) : [];
+
+            if (parsedTasks.length > 0) {
+                const nowText = formatHHMM();
+                sheetTasks = parsedTasks;
+                saveCachedSheetTasks(parsedTasks, nowText);
+                syncMeta = { source: 'live', lastSyncText: nowText };
+            } else {
+                const cached = loadCachedSheetTasks();
+                if (cached) {
+                    sheetTasks = cached.tasks;
+                    syncMeta = { source: 'cache', lastSyncText: cached.savedAt || '' };
+                } else {
+                    sheetTasks = structuredClone(DEFAULT_FALLBACK_TASKS);
+                    syncMeta = { source: 'fallback', lastSyncText: '' };
+                }
+            }
+
+            // 필터로 선택된 사람이 새 시트 목록에 없어졌으면 'ALL'로 복귀
+            const uniqueMembers = getUniqueMembers();
+            if (activeMemberFilter !== 'ALL' && !uniqueMembers.includes(activeMemberFilter)) {
+                activeMemberFilter = 'ALL';
+            }
+
+            updateSyncStatusUI();
+            renderMemberFilters();
+            renderTasks();
+            updateCountdownAndProgress();
+
+            setTimeout(() => icon.classList.remove('animate-spin'), isManual ? 450 : 250);
+        }
+
+        /* =========================================================================
+           5. 체크 상태 저장/유지 & 매일 아침 7시(07:00) 자동 초기화
         ========================================================================= */
         function getMorning7AMDateKey(now = new Date()) {
             const shifted = new Date(now.getTime());
@@ -764,55 +1055,299 @@
             return `${y}-${m}-${d}`;
         }
 
-        function saveState() {
+        // 할 일 + 누구 조합 키 (5분마다 시트 재로드 시 체크 상태 유지용)
+        function makeTaskKey(task, who) {
+            return `${(task || '').trim()}||${(who || '가족').trim()}`;
+        }
+
+        function saveCheckState() {
             try {
-                appState.dateKey = getMorning7AMDateKey();
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                checkState.dateKey = getMorning7AMDateKey();
+                localStorage.setItem(STORAGE_KEYS.CHECK_STATE, JSON.stringify(checkState));
             } catch (e) {
-                console.error('상태 저장 오류:', e);
+                console.error('체크 상태 저장 실패:', e);
             }
         }
 
-        function loadState() {
+        function loadCheckState() {
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
+                const raw = localStorage.getItem(STORAGE_KEYS.CHECK_STATE);
                 if (raw) {
                     const parsed = JSON.parse(raw);
-                    appState = {
-                        ...structuredClone(DEFAULT_STATE),
-                        ...parsed,
-                        tasks: Array.isArray(parsed.tasks) && parsed.tasks.length === 4
-                            ? parsed.tasks
-                            : structuredClone(DEFAULT_STATE.tasks)
+                    checkState = {
+                        dateKey: parsed.dateKey || '',
+                        checkedMap: (parsed.checkedMap && typeof parsed.checkedMap === 'object') ? parsed.checkedMap : {}
                     };
-                } else {
-                    appState = structuredClone(DEFAULT_STATE);
                 }
             } catch (e) {
-                console.error('상태 로드 오류:', e);
-                appState = structuredClone(DEFAULT_STATE);
+                console.error('체크 상태 로드 실패:', e);
+                checkState = { dateKey: '', checkedMap: {} };
             }
             checkMorningReset();
         }
 
-        /**
-         * 아침 7시가 지나 날짜 키가 바뀌면 모든 할 일 체크를 자동 해제합니다.
-         */
         function checkMorningReset() {
             const currentKey = getMorning7AMDateKey();
-            if (appState.dateKey && appState.dateKey !== currentKey) {
-                appState.tasks = appState.tasks.map(t => ({ ...t, done: false }));
-                appState.dateKey = currentKey;
-                saveState();
+            if (checkState.dateKey && checkState.dateKey !== currentKey) {
+                checkState.checkedMap = {};
+                checkState.dateKey = currentKey;
+                saveCheckState();
                 renderTasks();
                 updateCountdownAndProgress();
-            } else if (!appState.dateKey) {
-                saveState();
+            } else if (!checkState.dateKey) {
+                checkState.dateKey = currentKey;
+                saveCheckState();
+            }
+        }
+
+        function loadSettings() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+                if (raw) {
+                    settings = { ...settings, ...JSON.parse(raw) };
+                }
+            } catch (e) {
+                console.error('설정 로드 실패:', e);
+            }
+        }
+
+        function saveSettings() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+            } catch (e) {
+                console.error('설정 저장 실패:', e);
             }
         }
 
         /* =========================================================================
-           5. 레트로 시계, 날짜 & 출발 카운트다운/진행률 바 업데이트
+           6. 가족 구성원('누구') 필터 탭 & 할 일 카드 그리드 렌더링
+        ========================================================================= */
+        function getUniqueMembers() {
+            const seen = new Set();
+            const result = [];
+            sheetTasks.forEach(item => {
+                const who = (item.who || '가족').trim();
+                if (!seen.has(who)) {
+                    seen.add(who);
+                    result.push(who);
+                }
+            });
+            return result;
+        }
+
+        function getFilteredTasks() {
+            if (activeMemberFilter === 'ALL') return sheetTasks;
+            return sheetTasks.filter(item => item.who === activeMemberFilter);
+        }
+
+        function renderMemberFilters() {
+            const bar = document.getElementById('member-filter-bar');
+            bar.innerHTML = '';
+
+            const members = getUniqueMembers();
+            const tabs = [
+                { key: 'ALL', label: '전체', count: sheetTasks.length },
+                ...members.map(m => ({
+                    key: m,
+                    label: m,
+                    count: sheetTasks.filter(t => t.who === m).length
+                }))
+            ];
+
+            tabs.forEach(tab => {
+                const isActive = activeMemberFilter === tab.key;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+
+                if (isActive) {
+                    btn.className = 'inline-flex items-center gap-1 bg-[#4b8ec9] text-white ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-black shadow-xs transition active:scale-95';
+                } else {
+                    btn.className = 'inline-flex items-center gap-1 bg-[#cde8fc]/90 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
+                }
+
+                if (tab.key === 'ALL') {
+                    btn.innerHTML = `<span>🏠</span><span>전체</span><span class="opacity-80 text-[11px]">${tab.count}</span>`;
+                } else {
+                    const st = getWhoBadgeStyle(tab.key);
+                    btn.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${st.dot} border border-[#2b3a4a]"></span><span>${escapeHtml(tab.label)}</span>`;
+                }
+
+                btn.addEventListener('click', () => {
+                    activeMemberFilter = tab.key;
+                    renderMemberFilters();
+                    renderTasks();
+                    updateCountdownAndProgress();
+                });
+
+                bar.appendChild(btn);
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function spawnSparkles(cardEl) {
+            const colors = ['#facc15', '#34d399', '#60a5fa', '#fb7185', '#f97316'];
+            for (let i = 0; i < 10; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'sparkle-dot text-lg z-30';
+                dot.textContent = i % 2 === 0 ? '⭐' : '✨';
+                dot.style.left = '50%';
+                dot.style.top = '45%';
+                dot.style.color = colors[i % colors.length];
+                const angle = (Math.PI * 2 * i) / 10;
+                const dist = 55 + Math.random() * 45;
+                dot.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                dot.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                cardEl.appendChild(dot);
+                setTimeout(() => dot.remove(), 700);
+            }
+        }
+
+        function toggleTaskDone(taskItem, visibleIdx) {
+            const key = makeTaskKey(taskItem.task, taskItem.who);
+            const nextDone = !checkState.checkedMap[key];
+            if (nextDone) {
+                checkState.checkedMap[key] = true;
+            } else {
+                delete checkState.checkedMap[key];
+            }
+            saveCheckState();
+            renderTasks(visibleIdx, nextDone);
+            updateCountdownAndProgress();
+        }
+
+        function renderTasks(justCompletedIdx = -1, showBurst = false) {
+            const grid = document.getElementById('task-grid');
+            const visibleTasks = getFilteredTasks();
+            grid.innerHTML = '';
+
+            // 항목이 4개 이하일 때는 1줄에 화면을 꽉 채우고, 5개 이상일 때는 2줄/스크롤로 깔끔하게 배치
+            if (visibleTasks.length <= 4) {
+                grid.className = 'w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3';
+            } else {
+                grid.className = 'w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pb-2';
+            }
+
+            if (visibleTasks.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'col-span-full bg-white ink-border rounded-[18px] p-8 flex flex-col items-center justify-center text-center gap-2';
+                empty.innerHTML = `
+                    <span class="text-5xl">✨</span>
+                    <div class="font-display text-2xl text-[#2b3a4a]">표시할 할 일이 없어요!</div>
+                    <div class="text-sm font-bold text-[#64748b]">구글 시트에 할 일을 추가하면 5분마다 자동으로 나타납니다.</div>
+                `;
+                grid.appendChild(empty);
+                return;
+            }
+
+            // 아직 안 한 첫 번째 카드 인덱스
+            const firstUncheckedIdx = visibleTasks.findIndex(item => !checkState.checkedMap[makeTaskKey(item.task, item.who)]);
+
+            visibleTasks.forEach((item, idx) => {
+                const key = makeTaskKey(item.task, item.who);
+                const isDone = !!checkState.checkedMap[key];
+                const isActiveNext = idx === firstUncheckedIdx;
+                const whoStyle = getWhoBadgeStyle(item.who);
+                const compactMode = visibleTasks.length > 4;
+
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = [
+                    'relative w-full rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 active:scale-[0.98] overflow-hidden text-center',
+                    compactMode ? 'min-h-[215px] lg:min-h-[230px] p-3' : 'h-full min-h-[230px] p-3.5 sm:p-4',
+                    isDone ? 'bg-[#e6f9ed] ink-border' : 'bg-white ink-border hover:bg-[#fffef8]',
+                    isActiveNext ? 'active-task-card' : ''
+                ].join(' ');
+
+                card.addEventListener('click', () => toggleTaskDone(item, idx));
+
+                // 상단 행: 번호 동그라미 + 담당자('누구') 컬러 배지 + ('같이 하자!' / 초록 공룡)
+                const topRow = document.createElement('div');
+                topRow.className = 'w-full flex items-start justify-between gap-1 relative z-10 min-h-[38px]';
+
+                const leftGroup = document.createElement('div');
+                leftGroup.className = 'flex items-center flex-wrap gap-1.5';
+
+                const numCircle = document.createElement('span');
+                numCircle.className = [
+                    'w-8 h-8 sm:w-9 sm:h-9 rounded-full ink-border font-display text-lg sm:text-xl flex items-center justify-center leading-none shrink-0',
+                    isDone ? 'bg-[#34a853] text-white' : 'bg-white text-[#2b3a4a]'
+                ].join(' ');
+                numCircle.textContent = isDone ? '✓' : String(idx + 1);
+                leftGroup.appendChild(numCircle);
+
+                // 담당자('누구') 큰 컬러 배지
+                const whoBadge = document.createElement('span');
+                whoBadge.className = `inline-flex items-center gap-1 ${whoStyle.bg} ${whoStyle.text} border-[1.5px] ${whoStyle.border} rounded-full px-2.5 py-0.5 text-xs sm:text-sm font-black shadow-2xs`;
+                whoBadge.innerHTML = `<span class="w-2 h-2 rounded-full ${whoStyle.dot}"></span><span>${escapeHtml(item.who)}</span>`;
+                leftGroup.appendChild(whoBadge);
+
+                if (isActiveNext) {
+                    const goBadge = document.createElement('span');
+                    goBadge.className = 'bg-[#fde047] ink-border rounded-full px-2.5 py-0.5 text-xs font-black text-[#2b3a4a] shadow-xs';
+                    goBadge.textContent = '같이 하자!';
+                    leftGroup.appendChild(goBadge);
+                }
+
+                topRow.appendChild(leftGroup);
+
+                if (isActiveNext) {
+                    const dinoWrap = document.createElement('div');
+                    dinoWrap.className = '-mt-1 -mr-1 shrink-0';
+                    dinoWrap.innerHTML = COMPANION_DINO_SVG;
+                    topRow.appendChild(dinoWrap);
+                }
+
+                // 중앙 키워드 맞춤 동화풍 일러스트
+                const illusWrap = document.createElement('div');
+                illusWrap.className = [
+                    'flex-1 w-full flex items-center justify-center my-1 transition-opacity duration-200 min-h-0',
+                    compactMode ? 'max-h-[120px]' : '',
+                    isDone ? 'opacity-50' : 'opacity-100'
+                ].join(' ');
+                illusWrap.innerHTML = getIllustrationForTask(item.task);
+
+                // 하단 큰 한글 할 일 제목
+                const titleEl = document.createElement('div');
+                titleEl.className = [
+                    'font-display tracking-tight leading-snug pb-0.5 relative z-10 break-keep w-full px-1',
+                    compactMode ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl xl:text-[1.95rem]',
+                    isDone ? 'text-[#15803d] line-through decoration-[3px]' : 'text-[#2b3a4a]'
+                ].join(' ');
+                titleEl.textContent = item.task;
+
+                card.appendChild(topRow);
+                card.appendChild(illusWrap);
+                card.appendChild(titleEl);
+
+                // 완료 스탬프 오버레이
+                if (isDone) {
+                    const stamp = document.createElement('div');
+                    stamp.className = [
+                        'pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20',
+                        'bg-white/95 border-[3px] border-[#22c55e] text-[#15803d] rounded-2xl px-4 py-1.5 shadow-md font-display text-xl sm:text-2xl whitespace-nowrap -rotate-6',
+                        idx === justCompletedIdx ? 'stamp-pop' : ''
+                    ].join(' ');
+                    stamp.textContent = '잘했어요! ⭐';
+                    card.appendChild(stamp);
+                }
+
+                grid.appendChild(card);
+
+                if (showBurst && idx === justCompletedIdx) {
+                    spawnSparkles(card);
+                }
+            });
+        }
+
+        /* =========================================================================
+           7. 레트로 시계, 날짜 & 출발 카운트다운/진행률 바 업데이트
         ========================================================================= */
         const WEEKDAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 
@@ -842,30 +1377,29 @@
         }
 
         function updateCountdownAndProgress(now = new Date()) {
-            const doneCount = appState.tasks.filter(t => t.done).length;
-            const totalCount = appState.tasks.length;
-            const name = appState.childName || '우리';
+            const visibleTasks = getFilteredTasks();
+            const totalCount = visibleTasks.length;
+            const doneCount = visibleTasks.filter(t => !!checkState.checkedMap[makeTaskKey(t.task, t.who)]).length;
+            const targetName = activeMemberFilter !== 'ALL' ? activeMemberFilter : (settings.childName || '우리');
 
-            document.getElementById('departure-label').textContent = appState.departureLabel || '유치원 출발까지';
-            document.getElementById('departure-time-text').textContent = formatDepartureKorean(appState.departureTime);
+            document.getElementById('departure-label').textContent = settings.departureLabel || '유치원 출발까지';
+            document.getElementById('departure-time-text').textContent = formatDepartureKorean(settings.departureTime);
 
-            // 출발 시각까지의 남은 분 계산
-            const [depH, depM] = (appState.departureTime || '08:50').split(':').map(n => parseInt(n, 10));
+            const [depH, depM] = (settings.departureTime || '08:50').split(':').map(n => parseInt(n, 10));
             const target = new Date(now.getTime());
             target.setHours(depH, depM, 0, 0);
-
             const diffMin = Math.ceil((target.getTime() - now.getTime()) / 60000);
+
             const highlightEl = document.getElementById('countdown-highlight');
             const suffixEl = document.getElementById('countdown-suffix');
 
-            let progressPercent = Math.round((doneCount / totalCount) * 100);
+            let progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
-            if (doneCount === totalCount) {
-                highlightEl.textContent = '준비 완료!';
+            if (totalCount > 0 && doneCount === totalCount) {
+                highlightEl.textContent = '모두 완료!';
                 suffixEl.textContent = ' 🎉';
                 progressPercent = 100;
             } else if (diffMin > 0 && diffMin <= 180) {
-                // 출발 전 3시간 이내: 남은 시간 카운트다운 표시
                 if (diffMin >= 60) {
                     const hrs = Math.floor(diffMin / 60);
                     const mins = diffMin % 60;
@@ -875,52 +1409,49 @@
                 }
                 suffixEl.textContent = ' 남았어요';
 
-                // 시간 진행률(출발 60분 전 기준)과 할 일 진행률 중 더 보기 좋은 값 반영
-                const timeProgress = Math.max(8, Math.min(95, Math.round(((60 - Math.min(60, diffMin)) / 60) * 100)));
+                const timeProgress = Math.max(8, Math.min(94, Math.round(((60 - Math.min(60, diffMin)) / 60) * 100)));
                 progressPercent = doneCount > 0 ? Math.max(progressPercent, timeProgress) : timeProgress;
             } else {
-                // 출발 시각이 지났거나 너무 이른 경우: 오늘 준비 완료 개수 표시
                 highlightEl.textContent = `${doneCount}/${totalCount}`;
                 suffixEl.textContent = ' 완료했어요';
-                progressPercent = Math.max(10, Math.round((doneCount / totalCount) * 100));
+                progressPercent = Math.max(10, progressPercent);
             }
 
-            // 진행 바 & 마스코트 위치 업데이트 (마스코트가 양끝 밖으로 나가지 않도록 8% ~ 92% 클램프)
             const clamped = Math.max(8, Math.min(94, progressPercent));
             document.getElementById('progress-fill').style.width = `${progressPercent === 100 ? 100 : clamped}%`;
             document.getElementById('mascot-anchor').style.left = `${progressPercent === 100 ? 94 : clamped}%`;
 
-            // 말풍선 응원 문구
             const bubbleEl = document.getElementById('speech-bubble-text');
-            if (doneCount === totalCount) {
-                bubbleEl.textContent = `모두 완료! ${name} 최고야! 🎉`;
+            if (totalCount === 0) {
+                bubbleEl.textContent = '오늘 할 일을 불러오고 있어요!';
+            } else if (doneCount === totalCount) {
+                bubbleEl.textContent = `모두 완료! ${targetName} 최고야! 🎉`;
             } else if (doneCount === 0) {
-                bubbleEl.textContent = `${name}, 같이 준비하자!`;
+                bubbleEl.textContent = `${targetName}, 같이 준비하자!`;
             } else if (doneCount === totalCount - 1) {
-                bubbleEl.textContent = `딱 하나 남았어! 화이팅! ⭐`;
+                bubbleEl.textContent = `${targetName}, 딱 하나 남았어! ⭐`;
             } else {
                 bubbleEl.textContent = `우와 ${doneCount}개 성공! 잘하고 있어! 💛`;
             }
         }
 
         /* =========================================================================
-           6. Open-Meteo 날씨 + 미세먼지 API (경기도 시흥시 목감동, 키 불필요)
+           8. Open-Meteo 날씨 + 미세먼지 API (시흥시 목감동 37.3837, 126.8617)
         ========================================================================= */
         function decodeWMO(code) {
-            if (code === 0) return { icon: '☀️', text: '맑음', rain: false };
-            if (code === 1 || code === 2) return { icon: '⛅', text: '구름 조금', rain: false };
-            if (code === 3) return { icon: '☁️', text: '흐림', rain: false };
-            if (code === 45 || code === 48) return { icon: '🌫️', text: '안개', rain: false };
-            if ([51, 53, 55, 56, 57].includes(code)) return { icon: '🌦️', text: '이슬비', rain: true };
-            if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return { icon: '🌧️', text: '비', rain: true };
-            if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: '❄️', text: '눈', rain: true };
-            if ([95, 96, 99].includes(code)) return { icon: '⛈️', text: '천둥번개', rain: true };
-            return { icon: '⛅', text: '흐림', rain: false };
+            if (code === 0) return { icon: '☀️', text: '맑음' };
+            if (code === 1 || code === 2) return { icon: '⛅', text: '구름 조금' };
+            if (code === 3) return { icon: '☁️', text: '흐림' };
+            if (code === 45 || code === 48) return { icon: '🌫️', text: '안개' };
+            if ([51, 53, 55, 56, 57].includes(code)) return { icon: '🌦️', text: '이슬비' };
+            if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return { icon: '🌧️', text: '비' };
+            if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: '❄️', text: '눈' };
+            if ([95, 96, 99].includes(code)) return { icon: '⛈️', text: '천둥번개' };
+            return { icon: '⛅', text: '흐림' };
         }
 
         function getDustGrade(pm10, pm25) {
-            // 한국 환경부 기준 (PM10 또는 PM2.5 중 더 나쁜 등급 기준)
-            let level = 0; // 0: 좋음, 1: 보통, 2: 나쁨, 3: 매우나쁨
+            let level = 0;
             if (pm10 > 150 || pm25 > 75) level = 3;
             else if (pm10 > 80 || pm25 > 35) level = 2;
             else if (pm10 > 30 || pm25 > 15) level = 1;
@@ -947,10 +1478,9 @@
                     fetch(airUrl, { cache: 'no-store' }).catch(() => null)
                 ]);
 
-                if (!wRes.ok) throw new Error('날씨 API 응답 오류');
+                if (!wRes.ok) throw new Error('Open-Meteo 응답 오류');
                 const wData = await wRes.json();
 
-                // 1) 현재 날씨
                 const curTemp = Math.round(wData.current.temperature_2m);
                 const curInfo = decodeWMO(wData.current.weather_code);
                 const todayMax = Math.round(wData.daily.temperature_2m_max[0]);
@@ -961,7 +1491,6 @@
                 document.getElementById('w-now-desc').textContent = curInfo.text;
                 document.getElementById('w-today-minmax').textContent = `최고 ${todayMax}° · 최저 ${todayMin}°`;
 
-                // 2) 미세먼지
                 let pm10 = null;
                 let pm25 = null;
                 if (aRes && aRes.ok) {
@@ -976,15 +1505,14 @@
                     document.getElementById('dust-grade').textContent = grade.label;
                     document.getElementById('w-dust-values').textContent = `미세 ${pm10} · 초미세 ${pm25} ㎍`;
                 } else {
-                    document.getElementById('w-dust-values').textContent = '미세 정보 확인 중';
+                    document.getElementById('w-dust-values').textContent = '미세먼지 확인 중';
                 }
 
-                // 3) 4개 미니 컬럼: 오늘 8시, 12시, 16시 + 내일 요약
+                // 4개 예보 컬럼: 오늘 8시, 12시, 16시 + 내일
                 const targetHours = [8, 12, 16];
                 const colsContainer = document.getElementById('forecast-cols');
                 colsContainer.innerHTML = '';
 
-                // 오늘 시간대별 강수 피크 찾기 (나갈 때 팁용)
                 let peakRainHour = null;
                 let peakRainProb = 0;
                 for (let h = 7; h <= 21; h++) {
@@ -1011,7 +1539,6 @@
                     colsContainer.appendChild(col);
                 });
 
-                // 4번째 컬럼: 내일 날씨
                 const tomInfo = decodeWMO(wData.daily.weather_code[1] ?? 0);
                 const tomMin = Math.round(wData.daily.temperature_2m_min[1] ?? 0);
                 const tomMax = Math.round(wData.daily.temperature_2m_max[1] ?? 0);
@@ -1027,12 +1554,11 @@
                 `;
                 colsContainer.appendChild(tomCol);
 
-                // 4) '나갈 때' 실용 팁 생성
                 const tips = [];
                 if (peakRainProb >= 40 && peakRainHour !== null) {
                     tips.push(`${peakRainHour}시쯤 비 ${peakRainProb}% — 우산 챙기기`);
                 } else if (tomRain >= 50) {
-                    tips.push(`오늘은 비 걱정 없어요 (내일 비 ${tomRain}%)`);
+                    tips.push(`오늘 비 걱정 없어요 (내일 비 ${tomRain}%)`);
                 } else {
                     tips.push('오늘 맑고 산뜻해요');
                 }
@@ -1055,171 +1581,41 @@
             } catch (err) {
                 console.error('날씨 불러오기 실패:', err);
                 document.getElementById('w-now-desc').textContent = '연결 확인';
-                document.getElementById('w-outing-tip').textContent = '인터넷 연결을 확인한 뒤 [날씨 새로고침]을 눌러 주세요.';
+                document.getElementById('w-outing-tip').textContent = '인터넷 연결을 확인한 뒤 날씨 버튼을 눌러 새로고침해 주세요.';
             } finally {
                 setTimeout(() => refreshIcon.classList.remove('animate-spin'), 450);
             }
         }
 
         /* =========================================================================
-           7. 4개 대형 일러스트 할 일 카드 렌더링 & 터치 인터랙션
+           9. 설정 모달 제어 (출발 시각/문구 수정 & 체크 초기화)
         ========================================================================= */
-        function spawnSparkles(cardEl) {
-            const colors = ['#facc15', '#34d399', '#60a5fa', '#fb7185', '#f97316'];
-            for (let i = 0; i < 10; i++) {
-                const dot = document.createElement('span');
-                dot.className = 'sparkle-dot text-lg';
-                dot.textContent = i % 2 === 0 ? '⭐' : '✨';
-                dot.style.left = '50%';
-                dot.style.top = '45%';
-                dot.style.color = colors[i % colors.length];
-                const angle = (Math.PI * 2 * i) / 10;
-                const dist = 55 + Math.random() * 45;
-                dot.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
-                dot.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
-                cardEl.appendChild(dot);
-                setTimeout(() => dot.remove(), 700);
-            }
-        }
-
-        function toggleTask(index, cardEl) {
-            const wasDone = appState.tasks[index].done;
-            appState.tasks[index].done = !wasDone;
-            saveState();
-            renderTasks(index, !wasDone);
-            updateCountdownAndProgress();
-        }
-
-        function renderTasks(justCompletedIdx = -1, showBurst = false) {
-            const grid = document.getElementById('task-grid');
-            grid.innerHTML = '';
-
-            // 첫 번째 미완료 카드 인덱스 찾기 (노란 테두리 + '같이 하자!' + 초록 공룡 배지)
-            const firstUncheckedIdx = appState.tasks.findIndex(t => !t.done);
-
-            appState.tasks.forEach((task, idx) => {
-                const isActiveNext = idx === firstUncheckedIdx;
-                const card = document.createElement('button');
-                card.type = 'button';
-
-                card.className = [
-                    'relative w-full h-full min-h-[220px] rounded-[18px] p-3.5 sm:p-4 flex flex-col items-center justify-between transition-all duration-200 active:scale-[0.98] overflow-hidden text-center',
-                    task.done
-                        ? 'bg-[#e6f9ed] ink-border'
-                        : 'bg-white ink-border hover:bg-[#fffef8]',
-                    isActiveNext ? 'active-task-card' : ''
-                ].join(' ');
-
-                card.addEventListener('click', () => toggleTask(idx, card));
-
-                // 상단 행: 번호 동그라미 + ('같이 하자!' 알약) + (오른쪽 초록 공룡 SVG)
-                const topRow = document.createElement('div');
-                topRow.className = 'w-full flex items-start justify-between relative z-10 min-h-[40px]';
-
-                const leftTop = document.createElement('div');
-                leftTop.className = 'flex items-center gap-2';
-
-                const numCircle = document.createElement('span');
-                numCircle.className = [
-                    'w-9 h-9 sm:w-10 sm:h-10 rounded-full ink-border font-display text-xl sm:text-2xl flex items-center justify-center leading-none',
-                    task.done ? 'bg-[#34a853] text-white' : 'bg-white text-[#2b3a4a]'
-                ].join(' ');
-                numCircle.textContent = task.done ? '✓' : String(idx + 1);
-                leftTop.appendChild(numCircle);
-
-                if (isActiveNext) {
-                    const badge = document.createElement('span');
-                    badge.className = 'bg-[#fde047] ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-black text-[#2b3a4a] shadow-xs';
-                    badge.textContent = '같이 하자!';
-                    leftTop.appendChild(badge);
-                }
-
-                topRow.appendChild(leftTop);
-
-                if (isActiveNext) {
-                    const dinoWrap = document.createElement('div');
-                    dinoWrap.className = '-mt-1 -mr-1';
-                    dinoWrap.innerHTML = COMPANION_DINO_SVG;
-                    topRow.appendChild(dinoWrap);
-                }
-
-                // 중앙 일러스트 영역
-                const illusWrap = document.createElement('div');
-                illusWrap.className = [
-                    'flex-1 w-full flex items-center justify-center my-1 transition-opacity duration-200',
-                    task.done ? 'opacity-55' : 'opacity-100'
-                ].join(' ');
-                illusWrap.innerHTML = TASK_ILLUSTRATIONS[idx] || TASK_ILLUSTRATIONS[0];
-
-                // 하단 큰 한글 제목
-                const titleEl = document.createElement('div');
-                titleEl.className = [
-                    'font-display text-2xl sm:text-3xl xl:text-[2rem] tracking-tight leading-tight pb-1 relative z-10',
-                    task.done ? 'text-[#15803d] line-through decoration-[3px]' : 'text-[#2b3a4a]'
-                ].join(' ');
-                titleEl.textContent = task.title;
-
-                card.appendChild(topRow);
-                card.appendChild(illusWrap);
-                card.appendChild(titleEl);
-
-                // 완료 스탬프 오버레이
-                if (task.done) {
-                    const stamp = document.createElement('div');
-                    stamp.className = [
-                        'pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20',
-                        'bg-white/95 border-[3px] border-[#22c55e] text-[#15803d] rounded-2xl px-4 py-2 shadow-md font-display text-2xl sm:text-3xl whitespace-nowrap -rotate-6',
-                        idx === justCompletedIdx ? 'stamp-pop' : ''
-                    ].join(' ');
-                    stamp.textContent = '잘했어요! ⭐';
-                    card.appendChild(stamp);
-                }
-
-                grid.appendChild(card);
-
-                if (showBurst && idx === justCompletedIdx) {
-                    spawnSparkles(card);
-                }
-            });
-        }
-
-        /* =========================================================================
-           8. 설정/할 일 수정 모달 제어
-        ========================================================================= */
-        function openEditorModal() {
-            document.getElementById('input-child-name').value = appState.childName || '우리';
-            document.getElementById('input-dep-label').value = appState.departureLabel || '유치원 출발까지';
-            document.getElementById('input-dep-time').value = appState.departureTime || '08:50';
-            appState.tasks.forEach((t, i) => {
-                document.getElementById(`input-task-${i}`).value = t.title;
-            });
-            const modal = document.getElementById('editor-modal');
+        function openSettingsModal() {
+            document.getElementById('input-child-name').value = settings.childName || '우리';
+            document.getElementById('input-dep-label').value = settings.departureLabel || '유치원 출발까지';
+            document.getElementById('input-dep-time').value = settings.departureTime || '08:50';
+            const modal = document.getElementById('settings-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
 
-        function closeEditorModal() {
-            const modal = document.getElementById('editor-modal');
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
 
-        function saveEditorChanges() {
-            appState.childName = document.getElementById('input-child-name').value.trim() || '우리';
-            appState.departureLabel = document.getElementById('input-dep-label').value.trim() || '유치원 출발까지';
-            appState.departureTime = document.getElementById('input-dep-time').value || '08:50';
-            appState.tasks.forEach((t, i) => {
-                const val = document.getElementById(`input-task-${i}`).value.trim();
-                if (val) t.title = val;
-            });
-            saveState();
-            renderTasks();
+        function saveSettingsFromModal() {
+            settings.childName = document.getElementById('input-child-name').value.trim() || '우리';
+            settings.departureLabel = document.getElementById('input-dep-label').value.trim() || '유치원 출발까지';
+            settings.departureTime = document.getElementById('input-dep-time').value || '08:50';
+            saveSettings();
             updateCountdownAndProgress();
-            closeEditorModal();
+            closeSettingsModal();
         }
 
         /* =========================================================================
-           9. 밤 10시~아침 7시 야간 암전 모드 & 20초 잠깐 보기
+           10. 밤 10시(22:00) ~ 아침 7시(06:59) 야간 암전 모드 & 20초 잠깐 보기
         ========================================================================= */
         function isNightHours() {
             const h = new Date().getHours();
@@ -1277,7 +1673,7 @@
         }
 
         /* =========================================================================
-           10. Screen Wake Lock API (화면 자동 꺼짐 방지)
+           11. Screen Wake Lock API (화면 자동 꺼짐 방지)
         ========================================================================= */
         function setWakeLockUI(state) {
             const dot = document.getElementById('wakelock-dot');
@@ -1314,26 +1710,26 @@
         }
 
         /* =========================================================================
-           11. 이벤트 연결 및 초기화
+           12. 이벤트 연결 및 앱 초기화
         ========================================================================= */
         function bindEvents() {
+            document.getElementById('btn-refresh-sheet').addEventListener('click', () => fetchSheetTasks(true));
             document.getElementById('btn-refresh-weather').addEventListener('click', fetchWeatherAndDust);
-            document.getElementById('btn-open-editor').addEventListener('click', openEditorModal);
-            document.getElementById('btn-departure-area').addEventListener('click', openEditorModal);
-            document.getElementById('btn-close-editor').addEventListener('click', closeEditorModal);
-            document.getElementById('btn-cancel-editor').addEventListener('click', closeEditorModal);
-            document.getElementById('btn-save-editor').addEventListener('click', saveEditorChanges);
+            document.getElementById('btn-departure-area').addEventListener('click', openSettingsModal);
+            document.getElementById('btn-close-settings').addEventListener('click', closeSettingsModal);
+            document.getElementById('btn-cancel-settings').addEventListener('click', closeSettingsModal);
+            document.getElementById('btn-save-settings').addEventListener('click', saveSettingsFromModal);
 
             document.getElementById('btn-reset-checks').addEventListener('click', () => {
-                appState.tasks = appState.tasks.map(t => ({ ...t, done: false }));
-                saveState();
+                checkState.checkedMap = {};
+                saveCheckState();
                 renderTasks();
                 updateCountdownAndProgress();
-                closeEditorModal();
+                closeSettingsModal();
             });
 
-            document.getElementById('editor-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'editor-modal') closeEditorModal();
+            document.getElementById('settings-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'settings-modal') closeSettingsModal();
             });
 
             document.getElementById('btn-night-preview').addEventListener('click', () => {
@@ -1353,12 +1749,12 @@
             document.getElementById('btn-night-back').addEventListener('click', stopPeek);
             document.getElementById('btn-wakelock').addEventListener('click', requestWakeLock);
 
-            // 첫 사용자 터치 시 Wake Lock 자동 재요청
+            // 첫 터치 시 Wake Lock 자동 요청
             document.addEventListener('pointerdown', () => {
                 if (!wakeLockSentinel) requestWakeLock();
             }, { passive: true });
 
-            // 탭/앱 복귀 시 Wake Lock 및 시간/날짜 즉시 동기화
+            // 화면 복귀 시 Wake Lock, 시간, 아침 7시 초기화, 야간 모드 즉시 동기화
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     requestWakeLock();
@@ -1370,18 +1766,32 @@
         }
 
         function init() {
-            loadState();
+            loadSettings();
+            loadCheckState();
             bindEvents();
-            renderTasks();
+
+            // 캐시된 목록이 있으면 즉시 먼저 그려서 깜빡임 방지
+            const cached = loadCachedSheetTasks();
+            if (cached) {
+                sheetTasks = cached.tasks;
+                syncMeta = { source: 'cache', lastSyncText: cached.savedAt || '' };
+                updateSyncStatusUI();
+                renderMemberFilters();
+                renderTasks();
+            }
+
             updateClock();
-            fetchWeatherAndDust();
             updateNightOverlay();
             requestWakeLock();
+
+            // 구글 시트 및 날씨 최초 로드
+            fetchSheetTasks(false);
+            fetchWeatherAndDust();
 
             // 1초마다 시계 & 카운트다운 갱신
             setInterval(updateClock, 1000);
 
-            // 1분마다 아침 7시 자동 초기화 및 야간 모드 확인
+            // 1분마다 아침 7시 체크 초기화 및 야간 모드 확인
             setInterval(() => {
                 checkMorningReset();
                 if (!isNightHours() && isPeeking) {
@@ -1390,6 +1800,9 @@
                     updateNightOverlay();
                 }
             }, 60 * 1000);
+
+            // 5분(300,000ms)마다 구글 시트 CSV 자동 재조회
+            setInterval(() => fetchSheetTasks(false), 5 * 60 * 1000);
 
             // 30분마다 날씨 & 미세먼지 자동 갱신
             setInterval(fetchWeatherAndDust, 30 * 60 * 1000);
