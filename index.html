@@ -211,55 +211,74 @@
                     <span class="hidden xl:inline">날씨</span>
                 </button>
 
-                <button id="btn-night-preview" type="button" title="밤 10시~아침 7시 암전 모드 미리보기"
+                <button id="btn-night-preview" type="button" title="야간 암전 화면 미리보기"
                     class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span>🌙</span>
                     <span class="hidden xl:inline">야간</span>
                 </button>
 
-                <!-- 야간 20초 잠깐 보기 카운트다운 배지 -->
-                <div id="peek-badge" class="hidden items-center gap-1.5 bg-[#2b3a4a] text-white rounded-full px-3 py-1 text-xs sm:text-sm font-bold">
+                <div id="peek-badge" class="hidden items-center gap-1 bg-[#2b3a4a] text-white ink-border rounded-full px-2.5 py-1 text-xs font-bold">
                     <span id="peek-timer-text">👀 20초</span>
-                    <button id="btn-night-back" type="button" class="bg-[#facc15] text-[#2b3a4a] rounded-full px-2 py-0.5 text-xs font-extrabold">끄기</button>
+                    <button id="btn-night-back" type="button" class="underline text-[#fde047] ml-1">끄기</button>
                 </div>
 
-                <button id="btn-wakelock" type="button" title="화면 자동 꺼짐 방지 상태"
+                <button id="btn-wakelock" type="button" title="화면 항상 켜짐 유지"
                     class="inline-flex items-center gap-1.5 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
-                    <span id="wakelock-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-[#2b3a4a]"></span>
-                    <span id="wakelock-label" class="hidden sm:inline">켜짐 유지</span>
+                    <span id="wakelock-dot" class="w-2.5 h-2.5 rounded-full bg-[#22c55e] border border-[#2b3a4a]"></span>
+                    <span id="wakelock-label">항상 켜짐</span>
                 </button>
             </div>
         </nav>
 
-        <!-- 1-B. 헤더 메인: 좌측 동네 엠블럼 + 1.5배 확대된 레트로 날짜·시계 + 우측 다중 날씨 카드 -->
+        <!-- 1-B. 헤더 메인: 좌측 아이용 아날로그 시계 + 1.5배 확대된 레트로 날짜·시계 + 우측 다중 날씨 카드 -->
         <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-2.5 px-3 sm:px-4 pb-2 pt-0.5 min-h-0">
 
-            <!-- 좌측 묶음: 동네 배지/엠블럼 + 1.5배 커진 레트로 날짜·시계 -->
+            <!-- 좌측 묶음: 아이용 원형 아날로그 시계 + 1.5배 커진 레트로 날짜·디지털 시계 -->
             <div class="flex items-center gap-3 sm:gap-4 shrink-0 w-full lg:w-[49%] justify-between lg:justify-start min-w-0">
-                <!-- 동네 이름 & 귀여운 원형 엠블럼 -->
-                <div class="flex flex-col items-center shrink-0">
-                    <span class="text-[11px] sm:text-xs font-extrabold text-[#1e3a5f] tracking-tight leading-tight">경기도 시흥시 목감동</span>
-                    <span class="mt-0.5 px-2 py-0.5 rounded-md bg-[#facc15] ink-border text-[10px] font-extrabold text-[#2b3a4a] leading-none">우리집 월드</span>
-                    <svg class="w-10 h-10 sm:w-11 sm:h-11 mt-1 drop-shadow-xs" viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="32" r="28" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5"/>
-                        <path d="M4 32A28 28 0 0 1 60 32Z" fill="#ef4444" stroke="#2b3a4a" stroke-width="3.5"/>
-                        <line x1="4" y1="32" x2="60" y2="32" stroke="#2b3a4a" stroke-width="4"/>
-                        <circle cx="32" cy="32" r="9" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5"/>
-                        <circle cx="32" cy="32" r="3.5" fill="#e2e8f0"/>
+                <!-- 아이가 읽기 쉬운 큰 원형 아날로그 시계 (빨간 시침 / 파란 분침 / 주황 초침) -->
+                <div class="shrink-0 flex items-center justify-center">
+                    <svg id="analog-clock-svg" class="w-[116px] h-[116px] sm:w-[132px] sm:h-[132px] xl:w-[144px] xl:h-[144px] drop-shadow-sm" viewBox="0 0 160 160" fill="none" aria-label="아날로그 시계">
+                        <!-- 바깥 테두리 & 크림색 문자판 -->
+                        <circle cx="80" cy="80" r="75" fill="#fffdf7" stroke="#2b3a4a" stroke-width="5"/>
+                        <circle cx="80" cy="80" r="68" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+                        <!-- 5분 단위 눈금 & 1~12 숫자 (JS에서 정밀 생성) -->
+                        <g id="analog-ticks"></g>
+                        <g id="analog-numbers"></g>
+
+                        <!-- 시침 (굵은 빨간색 - 짧은 바늘) -->
+                        <g id="analog-hour-hand" transform="rotate(0 80 80)">
+                            <line x1="80" y1="86" x2="80" y2="43" stroke="#ef4444" stroke-width="7.5" stroke-linecap="round"/>
+                            <line x1="80" y1="86" x2="80" y2="43" stroke="#2b3a4a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+                        </g>
+
+                        <!-- 분침 (굵은 파란색 - 긴 바늘) -->
+                        <g id="analog-minute-hand" transform="rotate(0 80 80)">
+                            <line x1="80" y1="88" x2="80" y2="25" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round"/>
+                        </g>
+
+                        <!-- 초침 (주황색 - 얇은 바늘) -->
+                        <g id="analog-second-hand" transform="rotate(0 80 80)">
+                            <line x1="80" y1="94" x2="80" y2="20" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+                        </g>
+
+                        <!-- 중앙 핀 캡 -->
+                        <circle cx="80" cy="80" r="7" fill="#facc15" stroke="#2b3a4a" stroke-width="2.5"/>
+                        <circle cx="80" cy="80" r="2.2" fill="#2b3a4a"/>
                     </svg>
                 </div>
 
                 <!-- 1.5배 확대된 날짜(월/일/요일) + 레트로 픽셀 디지털 시계 -->
                 <div class="flex flex-col items-center lg:items-start leading-none min-w-0">
-                    <div id="clock-date" class="date-stroke font-display text-2xl sm:text-[1.75rem] xl:text-[2.1rem] tracking-wide mb-1 pl-1 sm:pl-6 whitespace-nowrap">
+                    <div id="clock-date" class="date-stroke font-display text-2xl sm:text-[1.75rem] xl:text-[2.1rem] tracking-wide mb-1 pl-1 sm:pl-4 whitespace-nowrap">
                         11월 20일 금요일
                     </div>
                     <div class="flex items-baseline gap-1.5 sm:gap-2">
-                        <span id="clock-ampm" class="ampm-stroke font-display text-2xl sm:text-[1.7rem] xl:text-[1.95rem] shrink-0">오전</span>
-                        <div class="clock-stroke font-pixel text-[3.8rem] sm:text-[4.6rem] xl:text-[5.5rem] tracking-tighter flex items-center leading-[0.88]">
-                            <span id="clock-hour">8</span>
-                            <span class="colon-blink mx-0.5 text-[3rem] sm:text-[3.8rem] xl:text-[4.5rem]">:</span>
-                            <span id="clock-min">10</span>
+                        <span id="clock-ampm" class="ampm-stroke font-display text-2xl sm:text-[1.7rem] xl:text-[1.95rem] shrink-0">오후</span>
+                        <div class="clock-stroke font-pixel text-[3.7rem] sm:text-[4.5rem] xl:text-[5.3rem] tracking-tighter flex items-center leading-[0.88]">
+                            <span id="clock-hour">11</span>
+                            <span class="colon-blink mx-0.5 text-[2.9rem] sm:text-[3.7rem] xl:text-[4.3rem]">:</span>
+                            <span id="clock-min">45</span>
                         </div>
                     </div>
                 </div>
@@ -446,6 +465,18 @@
                     </div>
                 </div>
 
+                <!-- 화면 항상 켜짐 / 야간 자동 암전 토글 (기본 OFF: 24시간 항상 켜짐) -->
+                <div class="bg-[#f8fafc] p-3.5 rounded-xl ink-border flex items-center justify-between gap-3">
+                    <div>
+                        <div class="text-sm font-black text-[#2b3a4a]">🌙 밤 10시~아침 7시 자동 화면 끄기</div>
+                        <div class="text-xs font-bold text-[#64748b]">기본은 꺼짐(OFF)이며 대시보드 화면이 항상 켜져 있습니다.</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input id="input-night-auto" type="checkbox" class="sr-only peer">
+                        <div class="w-12 h-7 bg-[#cbd5e1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-[#2b3a4a] after:border after:rounded-full after:h-[22px] after:w-[22px] after:transition-all peer-checked:bg-[#34a853] ink-border"></div>
+                    </label>
+                </div>
+
                 <div class="bg-[#fefce8] p-3 rounded-xl ink-border text-xs font-bold text-[#854d0e] leading-relaxed">
                     📋 할 일 목록은 연결된 <b>구글 시트</b>에서 5분마다 자동으로 불러옵니다.<br>
                     체크 표시 상태는 이 기기에 저장되며 <b>매일 아침 7시</b>에 자동으로 풀립니다.
@@ -530,7 +561,8 @@
         let settings = {
             childName: '우리',
             departureLabel: '유치원 출발까지',
-            departureTime: '08:50'
+            departureTime: '08:50',
+            nightAutoEnabled: false // 기본값 false: 밤에도 화면 자동 꺼짐 없이 항상 켜짐 유지
         };
 
         let sheetTasks = [];
@@ -548,6 +580,7 @@
         };
 
         let wakeLockSentinel = null;
+        let fallbackKeepAliveVideo = null;
         let isNightPreview = false;
         let isPeeking = false;
         let peekSeconds = 0;
@@ -1418,9 +1451,79 @@
         }
 
         /* =========================================================================
-           7. 레트로 시계, 날짜 & 출발 카운트다운/진행률 바 업데이트
+           7. 아날로그 시계, 레트로 디지털 시계, 날짜 & 출발 카운트다운/진행률 바
         ========================================================================= */
         const WEEKDAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+
+        /**
+         * 아이용 아날로그 시계의 5분 단위 눈금과 1~12 숫자를 한 번만 그립니다.
+         */
+        function buildAnalogClockFace() {
+            const ticksGroup = document.getElementById('analog-ticks');
+            const numsGroup = document.getElementById('analog-numbers');
+            if (!ticksGroup || !numsGroup) return;
+
+            ticksGroup.innerHTML = '';
+            numsGroup.innerHTML = '';
+
+            const cx = 80;
+            const cy = 80;
+            const svgNS = 'http://www.w3.org/2000/svg';
+
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6 - 90) * (Math.PI / 180);
+                const isHour = i % 5 === 0;
+                const rOuter = 66;
+                const rInner = isHour ? 59 : 63;
+
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('x1', (cx + rInner * Math.cos(angle)).toFixed(2));
+                line.setAttribute('y1', (cy + rInner * Math.sin(angle)).toFixed(2));
+                line.setAttribute('x2', (cx + rOuter * Math.cos(angle)).toFixed(2));
+                line.setAttribute('y2', (cy + rOuter * Math.sin(angle)).toFixed(2));
+                line.setAttribute('stroke', isHour ? '#2b3a4a' : '#cbd5e1');
+                line.setAttribute('stroke-width', isHour ? '2.6' : '1.2');
+                line.setAttribute('stroke-linecap', 'round');
+                ticksGroup.appendChild(line);
+            }
+
+            for (let h = 1; h <= 12; h++) {
+                const angle = (h * 30 - 90) * (Math.PI / 180);
+                const rNum = 48.5;
+                const x = cx + rNum * Math.cos(angle);
+                const y = cy + rNum * Math.sin(angle);
+
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', x.toFixed(2));
+                text.setAttribute('y', y.toFixed(2));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'central');
+                text.setAttribute('font-family', 'Jua, "Noto Sans KR", sans-serif');
+                text.setAttribute('font-size', [12, 3, 6, 9].includes(h) ? '15.5' : '13.5');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('fill', h === 12 ? '#ef4444' : '#2b3a4a');
+                text.textContent = String(h);
+                numsGroup.appendChild(text);
+            }
+        }
+
+        function updateAnalogClockHands(now = new Date()) {
+            const sec = now.getSeconds();
+            const min = now.getMinutes();
+            const hr = now.getHours() % 12;
+
+            const secDeg = sec * 6;
+            const minDeg = min * 6 + sec * 0.1;
+            const hourDeg = hr * 30 + min * 0.5;
+
+            const hourHand = document.getElementById('analog-hour-hand');
+            const minHand = document.getElementById('analog-minute-hand');
+            const secHand = document.getElementById('analog-second-hand');
+
+            if (hourHand) hourHand.setAttribute('transform', `rotate(${hourDeg.toFixed(2)} 80 80)`);
+            if (minHand) minHand.setAttribute('transform', `rotate(${minDeg.toFixed(2)} 80 80)`);
+            if (secHand) secHand.setAttribute('transform', `rotate(${secDeg.toFixed(2)} 80 80)`);
+        }
 
         function formatDepartureKorean(timeStr) {
             const [hStr, mStr] = (timeStr || '08:50').split(':');
@@ -1444,6 +1547,7 @@
             document.getElementById('clock-hour').textContent = String(h12);
             document.getElementById('clock-min').textContent = min;
 
+            updateAnalogClockHands(now);
             updateCountdownAndProgress(now);
         }
 
@@ -1507,163 +1611,152 @@
         }
 
         /* =========================================================================
-           8. Open-Meteo 날씨 + 미세먼지 API (시흥시 목감동 37.3837, 126.8617)
+           8. 경기도 시흥시 목감동 날씨 + 미세먼지 조회 (Open-Meteo API, 키 불필요)
         ========================================================================= */
-        function decodeWMO(code) {
+        function getWeatherMeta(code) {
             if (code === 0) return { icon: '☀️', text: '맑음' };
-            if (code === 1 || code === 2) return { icon: '⛅', text: '구름 조금' };
+            if (code === 1) return { icon: '🌤️', text: '대체로 맑음' };
+            if (code === 2) return { icon: '⛅', text: '구름 조금' };
             if (code === 3) return { icon: '☁️', text: '흐림' };
-            if (code === 45 || code === 48) return { icon: '🌫️', text: '안개' };
+            if ([45, 48].includes(code)) return { icon: '🌫️', text: '안개' };
             if ([51, 53, 55, 56, 57].includes(code)) return { icon: '🌦️', text: '이슬비' };
             if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return { icon: '🌧️', text: '비' };
             if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: '❄️', text: '눈' };
             if ([95, 96, 99].includes(code)) return { icon: '⛈️', text: '천둥번개' };
-            return { icon: '⛅', text: '흐림' };
+            return { icon: '⛅', text: '구름' };
         }
 
-        function getDustGrade(pm10, pm25) {
-            let level = 0;
-            if (pm10 > 150 || pm25 > 75) level = 3;
-            else if (pm10 > 80 || pm25 > 35) level = 2;
-            else if (pm10 > 30 || pm25 > 15) level = 1;
-
-            const presets = [
-                { label: '좋음', face: '😄', bg: 'bg-[#22c55e]' },
-                { label: '보통', face: '😊', bg: 'bg-[#2eb85c]' },
-                { label: '나쁨', face: '😷', bg: 'bg-[#f59e0b]' },
-                { label: '매우나쁨', face: '😣', bg: 'bg-[#ef4444]' }
-            ];
-            return presets[level];
+        function getDustGradeInfo(pm10, pm25) {
+            const v10 = pm10 ?? 25;
+            const v25 = pm25 ?? 12;
+            if (v10 <= 30 && v25 <= 15) {
+                return { grade: '좋음', face: '😄', bg: '#2563eb' };
+            }
+            if (v10 <= 80 && v25 <= 35) {
+                return { grade: '보통', face: '😊', bg: '#2eb85c' };
+            }
+            if (v10 <= 150 && v25 <= 75) {
+                return { grade: '나쁨', face: '😷', bg: '#f59e0b' };
+            }
+            return { grade: '매우나쁨', face: '😱', bg: '#ef4444' };
         }
 
         async function fetchWeatherAndDust() {
             const refreshIcon = document.getElementById('refresh-icon');
-            refreshIcon.classList.add('inline-block', 'animate-spin');
-
-            const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MOKGAM_COORDS.lat}&longitude=${MOKGAM_COORDS.lon}&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
-            const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${MOKGAM_COORDS.lat}&longitude=${MOKGAM_COORDS.lon}&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
+            if (refreshIcon) refreshIcon.classList.add('inline-block', 'animate-spin');
 
             try {
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MOKGAM_COORDS.lat}&longitude=${MOKGAM_COORDS.lon}&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+                const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${MOKGAM_COORDS.lat}&longitude=${MOKGAM_COORDS.lon}&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
+
                 const [wRes, aRes] = await Promise.all([
-                    fetch(forecastUrl, { cache: 'no-store' }),
-                    fetch(airUrl, { cache: 'no-store' }).catch(() => null)
+                    fetch(weatherUrl),
+                    fetch(airUrl).catch(() => null)
                 ]);
 
-                if (!wRes.ok) throw new Error('Open-Meteo 응답 오류');
+                if (!wRes.ok) throw new Error('날씨 API 응답 오류');
                 const wData = await wRes.json();
+                const aData = (aRes && aRes.ok) ? await aRes.json() : null;
 
                 const curTemp = Math.round(wData.current.temperature_2m);
-                const curInfo = decodeWMO(wData.current.weather_code);
+                const curMeta = getWeatherMeta(wData.current.weather_code);
                 const todayMax = Math.round(wData.daily.temperature_2m_max[0]);
                 const todayMin = Math.round(wData.daily.temperature_2m_min[0]);
 
-                document.getElementById('w-now-icon').textContent = curInfo.icon;
+                document.getElementById('w-now-icon').textContent = curMeta.icon;
                 document.getElementById('w-now-temp').textContent = `${curTemp}°`;
-                document.getElementById('w-now-desc').textContent = curInfo.text;
+                document.getElementById('w-now-desc').textContent = curMeta.text;
                 document.getElementById('w-today-minmax').textContent = `최고 ${todayMax}° · 최저 ${todayMin}°`;
 
-                let pm10 = null;
-                let pm25 = null;
-                if (aRes && aRes.ok) {
-                    const aData = await aRes.json();
-                    pm10 = Math.round(aData.current?.pm10 ?? 20);
-                    pm25 = Math.round(aData.current?.pm2_5 ?? 12);
-                    const grade = getDustGrade(pm10, pm25);
+                const pm10 = aData?.current?.pm10 != null ? Math.round(aData.current.pm10) : 28;
+                const pm25 = aData?.current?.pm2_5 != null ? Math.round(aData.current.pm2_5) : 14;
+                const dustInfo = getDustGradeInfo(pm10, pm25);
 
-                    const dustPill = document.getElementById('dust-pill');
-                    dustPill.className = `w-13 sm:w-15 shrink-0 rounded-xl ${grade.bg} text-white flex flex-col items-center justify-center py-1 px-1 text-center`;
-                    document.getElementById('dust-face').textContent = grade.face;
-                    document.getElementById('dust-grade').textContent = grade.label;
-                    document.getElementById('w-dust-values').textContent = `미세 ${pm10} · 초미세 ${pm25} ㎍`;
-                } else {
-                    document.getElementById('w-dust-values').textContent = '미세먼지 확인 중';
-                }
+                const dustPill = document.getElementById('dust-pill');
+                dustPill.style.backgroundColor = dustInfo.bg;
+                document.getElementById('dust-face').textContent = dustInfo.face;
+                document.getElementById('dust-grade').textContent = dustInfo.grade;
+                document.getElementById('w-dust-values').textContent = `미세 ${pm10} · 초미세 ${pm25} ㎍`;
 
                 const targetHours = [8, 12, 16];
                 const colsContainer = document.getElementById('forecast-cols');
                 colsContainer.innerHTML = '';
 
-                let peakRainHour = null;
-                let peakRainProb = 0;
-                for (let h = 7; h <= 21; h++) {
-                    const p = wData.hourly.precipitation_probability[h] ?? 0;
-                    if (p > peakRainProb) {
-                        peakRainProb = p;
-                        peakRainHour = h;
-                    }
-                }
+                let rainyHourText = '';
+                targetHours.forEach(hr => {
+                    const hrStr = `T${String(hr).padStart(2, '0')}:00`;
+                    const idx = wData.hourly.time.slice(0, 24).findIndex(t => t.endsWith(hrStr));
+                    const safeIdx = idx >= 0 ? idx : hr;
+                    const hTemp = Math.round(wData.hourly.temperature_2m[safeIdx] ?? curTemp);
+                    const hProb = Math.round(wData.hourly.precipitation_probability[safeIdx] ?? 0);
+                    const hMeta = getWeatherMeta(wData.hourly.weather_code[safeIdx] ?? wData.current.weather_code);
 
-                targetHours.forEach(h => {
-                    const t = Math.round(wData.hourly.temperature_2m[h] ?? curTemp);
-                    const p = wData.hourly.precipitation_probability[h] ?? 0;
-                    const info = decodeWMO(wData.hourly.weather_code[h] ?? 0);
+                    if (!rainyHourText && hProb >= 40) {
+                        rainyHourText = `${hr}시쯤 비 ${hProb}%`;
+                    }
 
                     const col = document.createElement('div');
                     col.className = 'bg-[#f4f7fb] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center';
                     col.innerHTML = `
-                        <span class="text-[10px] font-bold text-[#64748b] leading-none">${h}시</span>
-                        <span class="text-sm sm:text-base leading-none my-0.5">${info.icon}</span>
-                        <span class="text-xs font-black text-[#2b3a4a] leading-none">${t}°</span>
-                        <span class="text-[9px] font-bold text-[#2563eb] mt-0.5 leading-none">비 ${p}%</span>
+                        <span class="text-[10px] font-bold text-[#64748b]">${hr}시</span>
+                        <span class="text-sm sm:text-base leading-none my-0.5">${hMeta.icon}</span>
+                        <span class="text-xs font-black text-[#2b3a4a]">${hTemp}°</span>
+                        <span class="text-[9px] font-bold text-[#2563eb]">비 ${hProb}%</span>
                     `;
                     colsContainer.appendChild(col);
                 });
 
-                const tomInfo = decodeWMO(wData.daily.weather_code[1] ?? 0);
-                const tomMin = Math.round(wData.daily.temperature_2m_min[1] ?? 0);
-                const tomMax = Math.round(wData.daily.temperature_2m_max[1] ?? 0);
-                const tomRain = wData.daily.precipitation_probability_max[1] ?? 0;
+                const tmrMax = Math.round(wData.daily.temperature_2m_max[1] ?? todayMax);
+                const tmrMin = Math.round(wData.daily.temperature_2m_min[1] ?? todayMin);
+                const tmrProb = Math.round(wData.daily.precipitation_probability_max[1] ?? 0);
+                const tmrMeta = getWeatherMeta(wData.daily.weather_code[1] ?? 0);
 
-                const tomCol = document.createElement('div');
-                tomCol.className = 'bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center';
-                tomCol.innerHTML = `
-                    <span class="text-[10px] font-extrabold text-[#b45309] leading-none">내일</span>
-                    <span class="text-sm sm:text-base leading-none my-0.5">${tomInfo.icon}</span>
-                    <span class="text-[10px] sm:text-[11px] font-black text-[#2b3a4a] leading-none">${tomMin}/${tomMax}°</span>
-                    <span class="text-[9px] font-bold text-[#2563eb] mt-0.5 leading-none">비 ${tomRain}%</span>
+                const tmrCol = document.createElement('div');
+                tmrCol.className = 'bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center';
+                tmrCol.innerHTML = `
+                    <span class="text-[10px] font-extrabold text-[#b45309]">내일</span>
+                    <span class="text-sm sm:text-base leading-none my-0.5">${tmrMeta.icon}</span>
+                    <span class="text-[10px] sm:text-[11px] font-black text-[#2b3a4a]">${tmrMax}/${tmrMin}°</span>
+                    <span class="text-[9px] font-bold text-[#2563eb]">비 ${tmrProb}%</span>
                 `;
-                colsContainer.appendChild(tomCol);
+                colsContainer.appendChild(tmrCol);
 
                 const tips = [];
-                if (peakRainProb >= 40 && peakRainHour !== null) {
-                    tips.push(`${peakRainHour}시쯤 비 ${peakRainProb}% — 우산 챙기기`);
-                } else if (tomRain >= 50) {
-                    tips.push(`오늘 비 걱정 없어요 (내일 비 ${tomRain}%)`);
-                } else {
-                    tips.push('오늘 맑고 산뜻해요');
+                if (rainyHourText) {
+                    tips.push(`${rainyHourText} — 우산 챙기기`);
+                } else if (tmrProb >= 50) {
+                    tips.push(`내일 비 ${tmrProb}% 예보`);
                 }
-
                 if (curTemp <= 5) {
                     tips.push(`현재 ${curTemp}° 추움 — 두꺼운 패딩·장갑`);
-                } else if (curTemp <= 13) {
-                    tips.push(`아침 ${curTemp}° 쌀쌀 — 아이들 겉옷`);
+                } else if (curTemp <= 12) {
+                    tips.push(`현재 ${curTemp}° 쌀쌀 — 아이들 겉옷 챙기기`);
                 } else if (curTemp >= 27) {
-                    tips.push(`${curTemp}° 더움 — 시원한 옷·물통`);
+                    tips.push(`현재 ${curTemp}° 더움 — 물병·모자 챙기기`);
                 } else {
-                    tips.push(`${curTemp}° 활동하기 딱 좋아요`);
+                    tips.push(`현재 ${curTemp}° 선선함 — 가디건 추천`);
                 }
-
-                if (pm10 !== null && (pm10 > 80 || pm25 > 35)) {
-                    tips.push('미세먼지 나쁨 — 마스크 챙기기');
+                if (dustInfo.grade === '나쁨' || dustInfo.grade === '매우나쁨') {
+                    tips.push(`미세먼지 ${dustInfo.grade} — 마스크 필수!`);
                 }
-
                 document.getElementById('w-outing-tip').textContent = tips.join(' · ');
             } catch (err) {
-                console.error('날씨 불러오기 실패:', err);
-                document.getElementById('w-now-desc').textContent = '연결 확인';
-                document.getElementById('w-outing-tip').textContent = '인터넷 연결을 확인한 뒤 날씨 버튼을 눌러 새로고침해 주세요.';
+                console.error('날씨 조회 실패:', err);
+                document.getElementById('w-now-desc').textContent = '연결 대기';
+                document.getElementById('w-outing-tip').textContent = '시흥시 목감동 날씨 연결 대기 중 · 🌤️ 버튼을 눌러 재시도';
             } finally {
-                setTimeout(() => refreshIcon.classList.remove('animate-spin'), 450);
+                if (refreshIcon) setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
             }
         }
 
         /* =========================================================================
-           9. 설정 모달 제어 (출발 시각/문구 수정 & 체크 초기화)
+           9. 설정 모달 제어 (출발 시각/문구 수정, 자동 암전 설정 & 체크 초기화)
         ========================================================================= */
         function openSettingsModal() {
             document.getElementById('input-child-name').value = settings.childName || '우리';
             document.getElementById('input-dep-label').value = settings.departureLabel || '유치원 출발까지';
             document.getElementById('input-dep-time').value = settings.departureTime || '08:50';
+            document.getElementById('input-night-auto').checked = !!settings.nightAutoEnabled;
             const modal = document.getElementById('settings-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1679,17 +1772,26 @@
             settings.childName = document.getElementById('input-child-name').value.trim() || '우리';
             settings.departureLabel = document.getElementById('input-dep-label').value.trim() || '유치원 출발까지';
             settings.departureTime = document.getElementById('input-dep-time').value || '08:50';
+            settings.nightAutoEnabled = document.getElementById('input-night-auto').checked;
+            if (!settings.nightAutoEnabled && isPeeking) {
+                stopPeek();
+            }
             saveSettings();
+            updateNightOverlay();
             updateCountdownAndProgress();
             closeSettingsModal();
         }
 
         /* =========================================================================
-           10. 밤 10시(22:00) ~ 아침 7시(06:59) 야간 암전 모드 & 20초 잠깐 보기
+           10. 야간 암전 모드 (기본 OFF — 사용자가 켰을 때 또는 수동 미리보기 시에만 동작)
         ========================================================================= */
         function isNightHours() {
             const h = new Date().getHours();
             return h >= 22 || h < 7;
+        }
+
+        function isAutoBlackoutActive() {
+            return !!settings.nightAutoEnabled && isNightHours();
         }
 
         function updateNightOverlay() {
@@ -1697,7 +1799,7 @@
             const hint = document.getElementById('night-hint');
             const peekBadge = document.getElementById('peek-badge');
 
-            const shouldBlackout = isNightPreview || (isNightHours() && !isPeeking);
+            const shouldBlackout = isNightPreview || (isAutoBlackoutActive() && !isPeeking);
             if (shouldBlackout) {
                 overlay.classList.remove('hidden');
                 overlay.classList.add('flex');
@@ -1709,7 +1811,7 @@
                 overlay.classList.remove('flex');
             }
 
-            if (isPeeking && isNightHours()) {
+            if (isPeeking && isAutoBlackoutActive()) {
                 peekBadge.classList.remove('hidden');
                 peekBadge.classList.add('inline-flex');
             } else {
@@ -1780,6 +1882,83 @@
         }
 
         /* =========================================================================
+           11. Screen Wake Lock API + 무음 비디오 루프 폴백 (화면 항상 켜짐 유지)
+        ========================================================================= */
+        function setWakeLockUI(state) {
+            const dot = document.getElementById('wakelock-dot');
+            const label = document.getElementById('wakelock-label');
+            if (state === 'active') {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-[#22c55e] border border-[#2b3a4a]';
+                label.textContent = '항상 켜짐';
+            } else if (state === 'fallback') {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-[#22c55e] border border-[#2b3a4a]';
+                label.textContent = '항상 켜짐';
+            } else {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 border border-[#2b3a4a] animate-pulse';
+                label.textContent = '터치해 켜기';
+            }
+        }
+
+        /**
+         * Wake Lock이 차단되거나 미지원인 iOS/구형 태블릿을 위한 초소형 무음 루프 폴백
+         */
+        function startFallbackKeepAlive() {
+            try {
+                if (!fallbackKeepAliveVideo) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 2;
+                    canvas.height = 2;
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) ctx.fillRect(0, 0, 1, 1);
+
+                    const video = document.createElement('video');
+                    video.setAttribute('playsinline', '');
+                    video.muted = true;
+                    video.loop = true;
+                    video.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.001;pointer-events:none;bottom:0;right:0;';
+
+                    if (canvas.captureStream) {
+                        video.srcObject = canvas.captureStream(1);
+                    }
+                    document.body.appendChild(video);
+                    fallbackKeepAliveVideo = video;
+                }
+                if (fallbackKeepAliveVideo && fallbackKeepAliveVideo.srcObject) {
+                    fallbackKeepAliveVideo.play().then(() => {
+                        if (!wakeLockSentinel) setWakeLockUI('fallback');
+                    }).catch(() => {});
+                }
+            } catch (e) {
+                // 무시
+            }
+        }
+
+        async function requestWakeLock() {
+            if (!('wakeLock' in navigator)) {
+                startFallbackKeepAlive();
+                setWakeLockUI('fallback');
+                return;
+            }
+            try {
+                if (wakeLockSentinel) return;
+                wakeLockSentinel = await navigator.wakeLock.request('screen');
+                setWakeLockUI('active');
+                wakeLockSentinel.addEventListener('release', () => {
+                    wakeLockSentinel = null;
+                    setWakeLockUI('inactive');
+                    // 화면이 보이는 상태라면 즉시 재요청
+                    if (document.visibilityState === 'visible') {
+                        setTimeout(requestWakeLock, 500);
+                    }
+                });
+            } catch (err) {
+                wakeLockSentinel = null;
+                startFallbackKeepAlive();
+                setWakeLockUI('inactive');
+            }
+        }
+
+        /* =========================================================================
            12. 이벤트 연결 및 앱 초기화
         ========================================================================= */
         function bindEvents() {
@@ -1811,16 +1990,20 @@
                 if (isNightPreview) {
                     isNightPreview = false;
                     updateNightOverlay();
-                } else if (isNightHours()) {
+                } else if (isAutoBlackoutActive()) {
                     startPeek20s();
                 }
             });
 
             document.getElementById('btn-night-back').addEventListener('click', stopPeek);
-            document.getElementById('btn-wakelock').addEventListener('click', requestWakeLock);
+            document.getElementById('btn-wakelock').addEventListener('click', () => {
+                requestWakeLock();
+                startFallbackKeepAlive();
+            });
 
             document.addEventListener('pointerdown', () => {
                 if (!wakeLockSentinel) requestWakeLock();
+                startFallbackKeepAlive();
             }, { passive: true });
 
             document.addEventListener('visibilitychange', () => {
@@ -1836,6 +2019,7 @@
         function init() {
             loadSettings();
             loadCheckState();
+            buildAnalogClockFace();
             bindEvents();
 
             const cached = loadCachedSheetTasks();
@@ -1850,6 +2034,7 @@
             updateClock();
             updateNightOverlay();
             requestWakeLock();
+            startFallbackKeepAlive();
 
             fetchSheetTasks(false);
             fetchWeatherAndDust();
@@ -1858,12 +2043,15 @@
 
             setInterval(() => {
                 checkMorningReset();
-                if (!isNightHours() && isPeeking) {
+                if (!wakeLockSentinel && document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+                if (!isAutoBlackoutActive() && isPeeking) {
                     stopPeek();
                 } else {
                     updateNightOverlay();
                 }
-            }, 60 * 1000);
+            }, 30 * 1000);
 
             setInterval(() => fetchSheetTasks(false), 5 * 60 * 1000);
             setInterval(fetchWeatherAndDust, 30 * 60 * 1000);
