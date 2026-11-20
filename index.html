@@ -191,6 +191,13 @@
                     <span>우리집</span>
                 </div>
 
+                <!-- 현재 적용 중인 시트 모드 표시/전환 알약 배지 (평일 오전 6시~ 유치원 시트 자동 활성) -->
+                <button id="btn-sheet-mode" type="button" title="터치하여 기본 시트 / 유치원 시트 전환"
+                    class="inline-flex items-center gap-1 bg-[#fef08a] hover:bg-white text-[#854d0e] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-black shadow-xs transition active:scale-95">
+                    <span id="sheet-mode-icon">🏫</span>
+                    <span id="sheet-mode-label">유치원 루틴</span>
+                </button>
+
                 <!-- 가족 구성원(누구) 필터 탭 컨테이너 (시트에서 자동 생성) -->
                 <div id="member-filter-bar" class="flex items-center gap-1.5">
                     <!-- JS로 '전체' + 구성원 알약 버튼 렌더링 -->
@@ -465,6 +472,18 @@
                     </div>
                 </div>
 
+                <!-- 평일 오전 6시 유치원 시트 자동 노출 설정 -->
+                <div class="bg-[#fefce8] p-3.5 rounded-xl ink-border flex items-center justify-between gap-3">
+                    <div>
+                        <div class="text-sm font-black text-[#2b3a4a]">🏫 평일 오전 6시부터 '유치원' 시트 자동 노출</div>
+                        <div class="text-xs font-bold text-[#64748b]">매주 월~금 오전 6:00부터 구글 시트의 '유치원' 탭 내용을 항상 보여줍니다.</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input id="input-kindergarten-auto" type="checkbox" class="sr-only peer">
+                        <div class="w-12 h-7 bg-[#cbd5e1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-[#2b3a4a] after:border after:rounded-full after:h-[22px] after:w-[22px] after:transition-all peer-checked:bg-[#34a853] ink-border"></div>
+                    </label>
+                </div>
+
                 <!-- 화면 항상 켜짐 / 야간 자동 암전 토글 (기본 OFF: 24시간 항상 켜짐) -->
                 <div class="bg-[#f8fafc] p-3.5 rounded-xl ink-border flex items-center justify-between gap-3">
                     <div>
@@ -479,7 +498,7 @@
 
                 <div class="bg-[#fefce8] p-3 rounded-xl ink-border text-xs font-bold text-[#854d0e] leading-relaxed">
                     📋 할 일 목록은 연결된 <b>구글 시트</b>에서 5분마다 자동으로 불러옵니다.<br>
-                    체크 표시 상태는 이 기기에 저장되며 <b>매일 아침 7시</b>에 자동으로 풀립니다.
+                    매주 <b>평일(월~금) 오전 6시</b>부터는 <b>'유치원'</b> 시트가 자동으로 노출되며, 체크 상태는 <b>매일 아침 7시</b>에 초기화됩니다.
                 </div>
             </div>
 
@@ -543,11 +562,14 @@
            2. 상수, 구글 시트 CSV 주소, LocalStorage 키, 상태 정의
         ========================================================================= */
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh3u5mxfBwnGCDlZZh1zCfZI3kjSP0Mlb3d64umKM7HrfNyhQRxNEpsVmbm7JcRwn_RdI16lIEPjmF/pub?output=csv';
+        // 구글 시트 내 '유치원' 탭 전용 CSV 주소 (sheet=유치원 및 single=true 지원)
+        const KINDERGARTEN_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh3u5mxfBwnGCDlZZh1zCfZI3kjSP0Mlb3d64umKM7HrfNyhQRxNEpsVmbm7JcRwn_RdI16lIEPjmF/pub?output=csv&single=true&sheet=' + encodeURIComponent('유치원');
         const MOKGAM_COORDS = { lat: 37.3837, lon: 126.8617 };
 
         const STORAGE_KEYS = {
             SETTINGS: 'mokgam_dashboard_settings_v3',
             SHEET_CACHE: 'mokgam_dashboard_sheet_cache_v3',
+            KINDERGARTEN_CACHE: 'mokgam_dashboard_kindergarten_cache_v3',
             CHECK_STATE: 'mokgam_dashboard_check_state_v3'
         };
 
@@ -562,10 +584,13 @@
             childName: '우리',
             departureLabel: '유치원 출발까지',
             departureTime: '08:50',
-            nightAutoEnabled: false // 기본값 false: 밤에도 화면 자동 꺼짐 없이 항상 켜짐 유지
+            nightAutoEnabled: false, // 기본값 false: 밤에도 화면 자동 꺼짐 없이 항상 켜짐 유지
+            kindergartenWeekdayAuto: true // 기본값 true: 매주 평일(월~금) 오전 6시부터 '유치원' 시트 자동 노출
         };
 
         let sheetTasks = [];
+        let manualSheetOverride = null; // null(자동 스케줄 따름) | 'kindergarten' | 'default'
+        let lastActiveMode = null;
 
         let checkState = {
             dateKey: '',
@@ -1053,28 +1078,66 @@
             const btn = document.getElementById('btn-refresh-sheet');
             const label = document.getElementById('sheet-sync-label');
             const sub = document.getElementById('sheet-sub-status');
+            const modeBtn = document.getElementById('btn-sheet-mode');
+            const modeIcon = document.getElementById('sheet-mode-icon');
+            const modeLabel = document.getElementById('sheet-mode-label');
+
+            const isKgMode = isKindergartenModeActive();
+            const sheetDisplayName = isKgMode ? '유치원 시트' : '기본 시트';
+
+            if (modeBtn && modeIcon && modeLabel) {
+                if (isKgMode) {
+                    modeBtn.className = 'inline-flex items-center gap-1 bg-[#fef08a] hover:bg-white text-[#854d0e] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-black shadow-xs transition active:scale-95';
+                    modeIcon.textContent = '🏫';
+                    modeLabel.textContent = manualSheetOverride ? '유치원(고정)' : '유치원 루틴';
+                } else {
+                    modeBtn.className = 'inline-flex items-center gap-1 bg-[#e0f2fe] hover:bg-white text-[#0369a1] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-black shadow-xs transition active:scale-95';
+                    modeIcon.textContent = '🏠';
+                    modeLabel.textContent = manualSheetOverride ? '기본(고정)' : '주말·기본';
+                }
+            }
 
             if (syncMeta.source === 'live') {
                 btn.className = 'inline-flex items-center gap-1 bg-[#dcfce7] hover:bg-white text-[#166534] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
                 label.textContent = `시트 ${syncMeta.lastSyncText}`;
-                btn.title = `구글 시트 동기화 완료 (${syncMeta.lastSyncText}) · 누르면 다시 불러오기`;
-                sub.textContent = `구글 시트 동기화 완료 (${syncMeta.lastSyncText}) · 5분마다 자동 갱신`;
+                btn.title = `${sheetDisplayName} 동기화 완료 (${syncMeta.lastSyncText}) · 누르면 다시 불러오기`;
+                sub.textContent = `[${sheetDisplayName}] 동기화 완료 (${syncMeta.lastSyncText}) · 평일 오전 6시부터 유치원 루틴 자동 노출`;
             } else if (syncMeta.source === 'cache') {
                 btn.className = 'inline-flex items-center gap-1 bg-[#fef3c7] hover:bg-white text-[#92400e] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
                 label.textContent = '저장된 목록';
-                btn.title = `시트 연결 실패로 마지막 저장 목록(${syncMeta.lastSyncText || '이전'}) 표시 중 · 누르면 재시도`;
-                sub.textContent = `시트 연결 대기 중 — 마지막으로 읽은 목록(${syncMeta.lastSyncText || '저장됨'}) 표시 중`;
+                btn.title = `${sheetDisplayName} 연결 실패로 마지막 저장 목록(${syncMeta.lastSyncText || '이전'}) 표시 중 · 누르면 재시도`;
+                sub.textContent = `[${sheetDisplayName}] 연결 대기 중 — 마지막으로 읽은 목록(${syncMeta.lastSyncText || '저장됨'}) 표시 중`;
             } else {
                 btn.className = 'inline-flex items-center gap-1 bg-[#fee2e2] hover:bg-white text-[#991b1b] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95';
                 label.textContent = '기본 목록';
                 btn.title = '시트를 읽지 못해 기본 예시 목록을 표시 중 · 누르면 재시도';
-                sub.textContent = '시트 연결 실패 — 기본 예시 목록 표시 중 (5분마다 재시도)';
+                sub.textContent = `[${sheetDisplayName}] 연결 실패 — 기본 예시 목록 표시 중 (5분마다 재시도)`;
             }
         }
 
-        function loadCachedSheetTasks() {
+        /**
+         * 매주 평일(월~금) 오전 6시(06:00)부터 '유치원' 시트를 노출해야 하는지 판별합니다.
+         */
+        function isWeekdayMorning6OrLater(now = new Date()) {
+            const day = now.getDay(); // 0: 일요일, 1: 월요일 ~ 5: 금요일, 6: 토요일
+            const isWeekday = day >= 1 && day <= 5;
+            const isAfter6AM = now.getHours() >= 6;
+            return isWeekday && isAfter6AM;
+        }
+
+        function isKindergartenModeActive(now = new Date()) {
+            if (manualSheetOverride === 'kindergarten') return true;
+            if (manualSheetOverride === 'default') return false;
+            return !!settings.kindergartenWeekdayAuto && isWeekdayMorning6OrLater(now);
+        }
+
+        function getActiveCacheKey(isKgMode) {
+            return isKgMode ? STORAGE_KEYS.KINDERGARTEN_CACHE : STORAGE_KEYS.SHEET_CACHE;
+        }
+
+        function loadCachedSheetTasks(isKgMode = isKindergartenModeActive()) {
             try {
-                const raw = localStorage.getItem(STORAGE_KEYS.SHEET_CACHE);
+                const raw = localStorage.getItem(getActiveCacheKey(isKgMode));
                 if (!raw) return null;
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed.tasks) && parsed.tasks.length > 0) {
@@ -1086,9 +1149,9 @@
             return null;
         }
 
-        function saveCachedSheetTasks(tasks, timeText) {
+        function saveCachedSheetTasks(tasks, timeText, isKgMode = isKindergartenModeActive()) {
             try {
-                localStorage.setItem(STORAGE_KEYS.SHEET_CACHE, JSON.stringify({
+                localStorage.setItem(getActiveCacheKey(isKgMode), JSON.stringify({
                     tasks,
                     savedAt: timeText
                 }));
@@ -1097,37 +1160,53 @@
             }
         }
 
+        /**
+         * 구글 시트 CSV를 가져옵니다. '유치원' 탭을 불러올 때는
+         * 공개된 웹 시트의 탭 이름 파라미터(sheet=유치원)와 대체 파라미터를 순차 시도합니다.
+         */
+        async function fetchCsvFromCandidates(urls) {
+            for (const baseUrl of urls) {
+                const tsUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}_ts=${Date.now()}`;
+                try {
+                    const res = await fetch(tsUrl, { cache: 'no-store' });
+                    if (!res.ok) continue;
+                    const text = await res.text();
+                    // HTML 에러 페이지가 아닌 실제 CSV 데이터인지 확인
+                    if (text && !/^\s*<!doctype html/i.test(text) && !/^\s*<html/i.test(text)) {
+                        const tasks = extractTasksFromCSV(text);
+                        if (tasks.length > 0) return tasks;
+                    }
+                } catch (e) {
+                    // 다음 후보 URL 시도
+                }
+            }
+            return [];
+        }
+
         async function fetchSheetTasks(isManual = false) {
             const icon = document.getElementById('sheet-sync-icon');
             icon.classList.add('inline-block', 'animate-spin');
 
-            const tsUrl = `${SHEET_CSV_URL}${SHEET_CSV_URL.includes('?') ? '&' : '?'}_ts=${Date.now()}`;
-            let csvText = null;
+            const isKgMode = isKindergartenModeActive();
+            lastActiveMode = isKgMode;
 
-            try {
-                let res = null;
-                try {
-                    res = await fetch(tsUrl, { cache: 'no-store' });
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                } catch (firstErr) {
-                    res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                }
-                csvText = await res.text();
-            } catch (err) {
-                console.warn('구글 시트 CSV 불러오기 실패:', err);
-                csvText = null;
-            }
+            const candidateUrls = isKgMode
+                ? [
+                    KINDERGARTEN_SHEET_CSV_URL,
+                    `https://docs.google.com/spreadsheets/d/e/2PACX-1vRh3u5mxfBwnGCDlZZh1zCfZI3kjSP0Mlb3d64umKM7HrfNyhQRxNEpsVmbm7JcRwn_RdI16lIEPjmF/pub?output=csv&sheet=${encodeURIComponent('유치원')}`,
+                    SHEET_CSV_URL
+                ]
+                : [SHEET_CSV_URL];
 
-            const parsedTasks = csvText ? extractTasksFromCSV(csvText) : [];
+            const parsedTasks = await fetchCsvFromCandidates(candidateUrls);
 
             if (parsedTasks.length > 0) {
                 const nowText = formatHHMM();
                 sheetTasks = parsedTasks;
-                saveCachedSheetTasks(parsedTasks, nowText);
+                saveCachedSheetTasks(parsedTasks, nowText, isKgMode);
                 syncMeta = { source: 'live', lastSyncText: nowText };
             } else {
-                const cached = loadCachedSheetTasks();
+                const cached = loadCachedSheetTasks(isKgMode) || loadCachedSheetTasks(!isKgMode);
                 if (cached) {
                     sheetTasks = cached.tasks;
                     syncMeta = { source: 'cache', lastSyncText: cached.savedAt || '' };
@@ -1756,6 +1835,7 @@
             document.getElementById('input-child-name').value = settings.childName || '우리';
             document.getElementById('input-dep-label').value = settings.departureLabel || '유치원 출발까지';
             document.getElementById('input-dep-time').value = settings.departureTime || '08:50';
+            document.getElementById('input-kindergarten-auto').checked = settings.kindergartenWeekdayAuto !== false;
             document.getElementById('input-night-auto').checked = !!settings.nightAutoEnabled;
             const modal = document.getElementById('settings-modal');
             modal.classList.remove('hidden');
@@ -1772,12 +1852,15 @@
             settings.childName = document.getElementById('input-child-name').value.trim() || '우리';
             settings.departureLabel = document.getElementById('input-dep-label').value.trim() || '유치원 출발까지';
             settings.departureTime = document.getElementById('input-dep-time').value || '08:50';
+            settings.kindergartenWeekdayAuto = document.getElementById('input-kindergarten-auto').checked;
             settings.nightAutoEnabled = document.getElementById('input-night-auto').checked;
+            manualSheetOverride = null;
             if (!settings.nightAutoEnabled && isPeeking) {
                 stopPeek();
             }
             saveSettings();
             updateNightOverlay();
+            fetchSheetTasks(true);
             updateCountdownAndProgress();
             closeSettingsModal();
         }
@@ -1963,6 +2046,12 @@
         ========================================================================= */
         function bindEvents() {
             document.getElementById('btn-refresh-sheet').addEventListener('click', () => fetchSheetTasks(true));
+            document.getElementById('btn-sheet-mode').addEventListener('click', () => {
+                // 터치 시 '유치원' 시트 <-> '기본' 시트 즉시 전환
+                const currentlyKg = isKindergartenModeActive();
+                manualSheetOverride = currentlyKg ? 'default' : 'kindergarten';
+                fetchSheetTasks(true);
+            });
             document.getElementById('btn-refresh-weather').addEventListener('click', fetchWeatherAndDust);
             document.getElementById('btn-departure-area').addEventListener('click', openSettingsModal);
             document.getElementById('btn-close-settings').addEventListener('click', closeSettingsModal);
@@ -2043,6 +2132,11 @@
 
             setInterval(() => {
                 checkMorningReset();
+                // 매주 평일 오전 6시가 되어 모드가 바뀌면 즉시 '유치원' 시트를 불러와 노출
+                const currentKgMode = isKindergartenModeActive();
+                if (lastActiveMode !== null && lastActiveMode !== currentKgMode) {
+                    fetchSheetTasks(false);
+                }
                 if (!wakeLockSentinel && document.visibilityState === 'visible') {
                     requestWakeLock();
                 }
