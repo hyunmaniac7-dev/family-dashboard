@@ -83,29 +83,29 @@
                  2px -2px 0 #2b3a4a,
                 -2px  2px 0 #2b3a4a,
                  2px  2px 0 #2b3a4a,
-                 0px  2px 0 #2b3a4a;
+                 0px  2.5px 0 #2b3a4a;
         }
 
         .clock-stroke {
             color: #ffffff;
             text-shadow:
-                -3px -3px 0 #2b3a4a,
-                 3px -3px 0 #2b3a4a,
-                -3px  3px 0 #2b3a4a,
-                 3px  3px 0 #2b3a4a,
-                 0px  4px 0 #2b3a4a,
-                 4px  0px 0 #2b3a4a,
-                -4px  0px 0 #2b3a4a,
-                 0px -3px 0 #2b3a4a;
+                -3.5px -3.5px 0 #2b3a4a,
+                 3.5px -3.5px 0 #2b3a4a,
+                -3.5px  3.5px 0 #2b3a4a,
+                 3.5px  3.5px 0 #2b3a4a,
+                 0px  4.5px 0 #2b3a4a,
+                 4.5px  0px 0 #2b3a4a,
+                -4.5px  0px 0 #2b3a4a,
+                 0px -3.5px 0 #2b3a4a;
         }
 
         .ampm-stroke {
             color: #ffffff;
             text-shadow:
-                -1.5px -1.5px 0 #2b3a4a,
-                 1.5px -1.5px 0 #2b3a4a,
-                -1.5px  1.5px 0 #2b3a4a,
-                 1.5px  1.5px 0 #2b3a4a;
+                -2px -2px 0 #2b3a4a,
+                 2px -2px 0 #2b3a4a,
+                -2px  2px 0 #2b3a4a,
+                 2px  2px 0 #2b3a4a;
         }
 
         /* 콜론 깜빡임 */
@@ -162,7 +162,7 @@
             scrollbar-width: none;
         }
 
-        /* 태블릿 가로(lg 이상)에서는 전체 100vh 고정, 카드 영역만 필요 시 내부 스크롤 */
+        /* 태블릿 가로(lg 이상)에서는 전체 100vh 고정 */
         @media (min-width: 1024px) {
             body {
                 height: 100vh;
@@ -174,19 +174,18 @@
 <body class="w-full min-h-screen flex flex-col select-none">
 
     <!-- =====================================================================
-         1. 상단 하늘 배너 (알약 네비게이션 + 동네 엠블럼 + 레트로 시계 + 날씨 카드)
+         1. 상단 하늘 배너 (알약 네비게이션 + 동네 엠블럼 + 1.5배 확대 레트로 시계 + 날씨 카드)
     ====================================================================== -->
-    <header class="sky-banner w-full shrink-0 lg:h-[27vh] flex flex-col justify-between overflow-hidden">
+    <header class="sky-banner w-full shrink-0 lg:h-[30vh] flex flex-col justify-between overflow-hidden">
         <!-- 배경 장식: 귀여운 픽셀 스타일 구름 -->
         <div class="pointer-events-none absolute top-11 left-[28%] w-16 h-4 bg-white/80 rounded-full"></div>
-        <div class="pointer-events-none absolute top-16 left-[39%] w-11 h-3.5 bg-white/85 rounded-full"></div>
-        <div class="pointer-events-none absolute top-9 right-[44%] w-14 h-3.5 bg-white/60 rounded-full"></div>
+        <div class="pointer-events-none absolute top-16 left-[42%] w-11 h-3.5 bg-white/85 rounded-full"></div>
+        <div class="pointer-events-none absolute top-9 right-[45%] w-14 h-3.5 bg-white/60 rounded-full"></div>
 
         <!-- 1-A. 상단 알약 네비게이션 바 (대시보드 + 가족 구성원 필터 + 시트/날씨/야간/WakeLock) -->
         <nav class="relative z-10 flex items-center justify-between gap-2 px-3 sm:px-4 pt-2 pb-1 overflow-x-auto no-scrollbar">
             <!-- 왼쪽: 타이틀 + 가족 구성원(누구) 동적 필터 탭 -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <!-- 브랜드 배지 알약 -->
                 <div class="inline-flex items-center gap-1.5 bg-white ink-border rounded-full px-3 py-1 text-xs sm:text-sm font-black text-[#2b3a4a] shadow-xs">
                     <span class="w-3.5 h-3.5 rounded-full border-[1.5px] border-[#2b3a4a] bg-gradient-to-b from-[#ef4444] 50% to-white 50% inline-block"></span>
                     <span>우리집</span>
@@ -200,21 +199,18 @@
 
             <!-- 오른쪽: 시트 동기화 상태/새로고침 + 날씨 새로고침 + 야간 미리보기 + Wake Lock -->
             <div class="flex items-center gap-1.5 shrink-0">
-                <!-- 구글 시트 동기화 상태 & 수동 새로고침 버튼 -->
                 <button id="btn-refresh-sheet" type="button" title="구글 시트에서 할 일 다시 불러오기"
                     class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span id="sheet-sync-icon">📋</span>
                     <span id="sheet-sync-label">시트 연결 중</span>
                 </button>
 
-                <!-- 날씨 새로고침 버튼 -->
                 <button id="btn-refresh-weather" type="button" title="시흥시 목감동 날씨 새로고침"
                     class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span id="refresh-icon">🌤️</span>
                     <span class="hidden xl:inline">날씨</span>
                 </button>
 
-                <!-- 야간 암전 미리보기 버튼 -->
                 <button id="btn-night-preview" type="button" title="밤 10시~아침 7시 암전 모드 미리보기"
                     class="inline-flex items-center gap-1 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span>🌙</span>
@@ -227,7 +223,6 @@
                     <button id="btn-night-back" type="button" class="bg-[#facc15] text-[#2b3a4a] rounded-full px-2 py-0.5 text-xs font-extrabold">끄기</button>
                 </div>
 
-                <!-- Wake Lock 화면 꺼짐 방지 상태 -->
                 <button id="btn-wakelock" type="button" title="화면 자동 꺼짐 방지 상태"
                     class="inline-flex items-center gap-1.5 bg-[#cde8fc]/95 hover:bg-white text-[#2b3a4a] ink-border rounded-full px-2.5 py-1 text-xs sm:text-sm font-bold transition active:scale-95">
                     <span id="wakelock-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-[#2b3a4a]"></span>
@@ -236,11 +231,11 @@
             </div>
         </nav>
 
-        <!-- 1-B. 헤더 메인: 좌측 동네 엠블럼 + 중앙 레트로 시계 + 우측 다중 날씨 카드 -->
-        <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-2 px-3 sm:px-4 pb-2 pt-0.5 min-h-0">
+        <!-- 1-B. 헤더 메인: 좌측 동네 엠블럼 + 1.5배 확대된 레트로 날짜·시계 + 우측 다중 날씨 카드 -->
+        <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-2.5 px-3 sm:px-4 pb-2 pt-0.5 min-h-0">
 
-            <!-- 좌측 묶음: 동네 배지/엠블럼 + 대형 레트로 시계 -->
-            <div class="flex items-center gap-3 sm:gap-5 shrink-0 w-full lg:w-auto justify-between lg:justify-start">
+            <!-- 좌측 묶음: 동네 배지/엠블럼 + 1.5배 커진 레트로 날짜·시계 -->
+            <div class="flex items-center gap-3 sm:gap-4 shrink-0 w-full lg:w-[49%] justify-between lg:justify-start min-w-0">
                 <!-- 동네 이름 & 귀여운 원형 엠블럼 -->
                 <div class="flex flex-col items-center shrink-0">
                     <span class="text-[11px] sm:text-xs font-extrabold text-[#1e3a5f] tracking-tight leading-tight">경기도 시흥시 목감동</span>
@@ -254,16 +249,16 @@
                     </svg>
                 </div>
 
-                <!-- 중앙-왼쪽: 큰 날짜(월/일/요일) + 레트로 픽셀 디지털 시계 -->
-                <div class="flex flex-col items-center lg:items-start leading-none">
-                    <div id="clock-date" class="date-stroke font-display text-lg sm:text-xl xl:text-2xl tracking-wide mb-0.5 pl-4">
+                <!-- 1.5배 확대된 날짜(월/일/요일) + 레트로 픽셀 디지털 시계 -->
+                <div class="flex flex-col items-center lg:items-start leading-none min-w-0">
+                    <div id="clock-date" class="date-stroke font-display text-2xl sm:text-[1.75rem] xl:text-[2.1rem] tracking-wide mb-1 pl-1 sm:pl-6 whitespace-nowrap">
                         11월 20일 금요일
                     </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span id="clock-ampm" class="ampm-stroke font-display text-lg sm:text-xl">오전</span>
-                        <div class="clock-stroke font-pixel text-5xl sm:text-6xl xl:text-[4.2rem] tracking-tight flex items-center leading-none">
+                    <div class="flex items-baseline gap-1.5 sm:gap-2">
+                        <span id="clock-ampm" class="ampm-stroke font-display text-2xl sm:text-[1.7rem] xl:text-[1.95rem] shrink-0">오전</span>
+                        <div class="clock-stroke font-pixel text-[3.8rem] sm:text-[4.6rem] xl:text-[5.5rem] tracking-tighter flex items-center leading-[0.88]">
                             <span id="clock-hour">8</span>
-                            <span class="colon-blink mx-0.5 text-4xl sm:text-5xl">:</span>
+                            <span class="colon-blink mx-0.5 text-[3rem] sm:text-[3.8rem] xl:text-[4.5rem]">:</span>
                             <span id="clock-min">10</span>
                         </div>
                     </div>
@@ -271,52 +266,52 @@
             </div>
 
             <!-- 우측: 둥근 흰색 다중 패널 날씨 카드 (Open-Meteo + Air Quality) -->
-            <div class="w-full lg:w-[54%] xl:w-[53%] bg-white ink-border rounded-[16px] px-2.5 py-2 shadow-sm flex flex-col justify-between gap-1.5">
-                <div class="flex items-stretch gap-2">
+            <div class="w-full lg:w-[50%] xl:w-[50%] bg-white ink-border rounded-[16px] px-2.5 py-2 shadow-sm flex flex-col justify-between gap-1.5 shrink-0">
+                <div class="flex items-stretch gap-1.5 sm:gap-2">
                     <!-- 1) 미세먼지 등급 세로 배지 -->
-                    <div id="dust-pill" class="w-14 sm:w-16 shrink-0 rounded-xl bg-[#2eb85c] text-white flex flex-col items-center justify-center py-1 px-1 text-center">
+                    <div id="dust-pill" class="w-13 sm:w-15 shrink-0 rounded-xl bg-[#2eb85c] text-white flex flex-col items-center justify-center py-1 px-1 text-center">
                         <span class="text-[10px] font-bold leading-none opacity-95">미세먼지</span>
                         <span id="dust-face" class="text-xl sm:text-2xl leading-none my-0.5">😊</span>
-                        <span id="dust-grade" class="text-xs sm:text-sm font-black leading-none">보통</span>
+                        <span id="dust-grade" class="text-xs font-black leading-none">보통</span>
                     </div>
 
                     <!-- 2) 현재 기온, 날씨, 최고/최저, 미세/초미세 수치 -->
-                    <div class="flex items-center gap-2 shrink-0 pr-1">
+                    <div class="flex items-center gap-1.5 shrink-0 pr-0.5">
                         <div class="flex items-center gap-1">
-                            <span id="w-now-icon" class="text-3xl sm:text-4xl leading-none">⛅</span>
-                            <span id="w-now-temp" class="text-3xl sm:text-4xl font-black text-[#2b3a4a] tracking-tight leading-none">--°</span>
+                            <span id="w-now-icon" class="text-2xl sm:text-3xl leading-none">⛅</span>
+                            <span id="w-now-temp" class="text-2xl sm:text-3xl font-black text-[#2b3a4a] tracking-tight leading-none">--°</span>
                         </div>
                         <div class="flex flex-col justify-center text-left leading-tight">
-                            <span id="w-now-desc" class="text-sm sm:text-base font-black text-[#2b3a4a]">불러오는 중</span>
-                            <span id="w-today-minmax" class="text-[11px] font-bold text-[#475569]">최고 --° · 최저 --°</span>
+                            <span id="w-now-desc" class="text-xs sm:text-sm font-black text-[#2b3a4a]">불러오는 중</span>
+                            <span id="w-today-minmax" class="text-[10px] sm:text-[11px] font-bold text-[#475569]">최고 --° · 최저 --°</span>
                             <span id="w-dust-values" class="text-[10px] font-bold text-[#64748b]">미세 -- · 초미세 -- ㎍</span>
                         </div>
                     </div>
 
                     <!-- 3) 오른쪽 4개 예보 컬럼 (8시, 12시, 16시, 내일) -->
                     <div id="forecast-cols" class="flex-1 grid grid-cols-4 gap-1 min-w-0">
-                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center">
+                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-[#64748b]">8시</span>
-                            <span class="text-base leading-none my-0.5">⛅</span>
+                            <span class="text-sm sm:text-base leading-none my-0.5">⛅</span>
                             <span class="text-xs font-black text-[#2b3a4a]">--°</span>
                             <span class="text-[9px] font-bold text-[#2563eb]">비 --%</span>
                         </div>
-                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center">
+                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-[#64748b]">12시</span>
-                            <span class="text-base leading-none my-0.5">⛅</span>
+                            <span class="text-sm sm:text-base leading-none my-0.5">⛅</span>
                             <span class="text-xs font-black text-[#2b3a4a]">--°</span>
                             <span class="text-[9px] font-bold text-[#2563eb]">비 --%</span>
                         </div>
-                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center">
+                        <div class="bg-[#f4f7fb] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-[#64748b]">16시</span>
-                            <span class="text-base leading-none my-0.5">⛅</span>
+                            <span class="text-sm sm:text-base leading-none my-0.5">⛅</span>
                             <span class="text-xs font-black text-[#2b3a4a]">--°</span>
                             <span class="text-[9px] font-bold text-[#2563eb]">비 --%</span>
                         </div>
-                        <div class="bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center">
+                        <div class="bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-extrabold text-[#b45309]">내일</span>
-                            <span class="text-base leading-none my-0.5">☀️</span>
-                            <span class="text-[11px] font-black text-[#2b3a4a]">--/--°</span>
+                            <span class="text-sm sm:text-base leading-none my-0.5">☀️</span>
+                            <span class="text-[10px] sm:text-[11px] font-black text-[#2b3a4a]">--/--°</span>
                             <span class="text-[9px] font-bold text-[#2563eb]">비 --%</span>
                         </div>
                     </div>
@@ -337,7 +332,7 @@
     <!-- =====================================================================
          2. 중단 카운트다운 & 진행률 바 (출발 시각 클릭 시 설정 모달 오픈)
     ====================================================================== -->
-    <section class="w-full px-3.5 pt-2.5 pb-2 shrink-0 lg:h-[16vh] flex items-center">
+    <section class="w-full px-3.5 pt-2 pb-1.5 shrink-0 lg:h-[15vh] flex items-center">
         <div class="w-full h-full bg-white ink-border rounded-[18px] px-4 sm:px-5 py-2 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
 
             <!-- 왼쪽: 출발 카운트다운 (터치하여 출발 시각/문구 수정) -->
@@ -347,7 +342,7 @@
                     <span id="departure-label" class="text-sm sm:text-base font-extrabold text-[#475569] leading-tight">유치원 출발까지</span>
                     <span class="text-xs text-[#94a3b8] group-hover:text-[#2b3a4a]">✏️</span>
                 </div>
-                <div id="countdown-main" class="text-2xl sm:text-3xl xl:text-[2.1rem] font-black text-[#2b3a4a] leading-tight tracking-tight">
+                <div id="countdown-main" class="text-2xl sm:text-3xl xl:text-[2.05rem] font-black text-[#2b3a4a] leading-tight tracking-tight">
                     <span id="countdown-highlight" class="text-[#2f9e44]">40분</span>
                     <span id="countdown-suffix"> 남았어요</span>
                 </div>
@@ -525,7 +520,6 @@
             CHECK_STATE: 'mokgam_dashboard_check_state_v3'
         };
 
-        // 최초 접속 시 시트도 못 읽고 저장된 캐시도 없을 때만 쓰는 기본 예시 4개
         const DEFAULT_FALLBACK_TASKS = [
             { task: '아침 먹기', who: '아이' },
             { task: '세수·양치', who: '아이' },
@@ -539,25 +533,20 @@
             departureTime: '08:50'
         };
 
-        // 현재 표시 중인 전체 할 일 목록: [{ task: string, who: string }]
         let sheetTasks = [];
 
-        // 체크 상태: { dateKey: 'YYYY-MM-DD', checkedMap: { 'task||who': true } }
         let checkState = {
             dateKey: '',
             checkedMap: {}
         };
 
-        // 현재 선택된 담당자 필터 ('ALL' 또는 특정 이름)
         let activeMemberFilter = 'ALL';
 
-        // 시트 동기화 상태
         let syncMeta = {
-            source: 'loading', // 'live' | 'cache' | 'fallback'
+            source: 'loading',
             lastSyncText: ''
         };
 
-        // Wake Lock & 야간 암전 상태
         let wakeLockSentinel = null;
         let isNightPreview = false;
         let isPeeking = false;
@@ -565,7 +554,9 @@
         let peekTimerId = null;
 
         /* =========================================================================
-           3. 귀여운 동화풍 인라인 SVG 일러스트 라이브러리 (키워드별 자동 매칭)
+           3. 귀여운 남자아이 캐릭터 인라인 SVG 일러스트 라이브러리
+              - 목/귀 뒤로 내려오는 단발머리 실루엣을 완전히 제거하고,
+                양쪽 귀가 또렷하게 보이는 짧은 뾰족 앞머리 남자아이로 통일
         ========================================================================= */
         const COMPANION_DINO_SVG = `
             <svg class="w-11 h-11 sm:w-12 sm:h-12 drop-shadow-xs shrink-0" viewBox="0 0 64 64" fill="none">
@@ -585,216 +576,316 @@
             </svg>
         `;
 
+        /**
+         * 공통 남자아이 머리 헬퍼:
+         * 뒷머리/옆머리 긴 실루엣 전혀 없이, 양쪽 귀가 또렷히 보이고
+         * 정수리 뾰족 삐침 + 짧은 앞머리만 있는 귀여운 남자아이 헤어스타일
+         */
+        function renderBoyHead(cx, cy, expression = 'smile') {
+            let eyesAndMouth = '';
+            if (expression === 'happyEat') {
+                eyesAndMouth = `
+                    <path d="M${cx - 15} ${cy - 6} Q${cx - 11} ${cy - 9} ${cx - 7} ${cy - 6}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M${cx + 7} ${cy - 6} Q${cx + 11} ${cy - 9} ${cx + 15} ${cy - 6}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M${cx - 15} ${cy + 1} Q${cx - 10} ${cy - 3} ${cx - 5} ${cy + 1}" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
+                    <path d="M${cx + 5} ${cy + 1} Q${cx + 10} ${cy - 3} ${cx + 15} ${cy + 1}" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
+                    <ellipse cx="${cx - 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <ellipse cx="${cx + 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <path d="M${cx - 5} ${cy + 11} Q${cx} ${cy + 16} ${cx + 5} ${cy + 11}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                `;
+            } else if (expression === 'brush') {
+                eyesAndMouth = `
+                    <path d="M${cx - 15} ${cy - 6} Q${cx - 11} ${cy - 9} ${cx - 7} ${cy - 6}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M${cx + 7} ${cy - 6} Q${cx + 11} ${cy - 9} ${cx + 15} ${cy - 6}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <circle cx="${cx - 11}" cy="${cy}" r="3.2" fill="#2b3a4a"/>
+                    <circle cx="${cx + 11}" cy="${cy}" r="3.2" fill="#2b3a4a"/>
+                    <ellipse cx="${cx - 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <ellipse cx="${cx + 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <rect x="${cx - 8}" y="${cy + 9}" width="16" height="8" rx="4" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.4"/>
+                    <circle cx="${cx - 9}" cy="${cy + 14}" r="3.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
+                `;
+            } else if (expression === 'bigLaugh') {
+                eyesAndMouth = `
+                    <path d="M${cx - 15} ${cy - 7} Q${cx - 11} ${cy - 10} ${cx - 7} ${cy - 7}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M${cx + 7} ${cy - 7} Q${cx + 11} ${cy - 10} ${cx + 15} ${cy - 7}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <circle cx="${cx - 11}" cy="${cy - 1}" r="3.2" fill="#2b3a4a"/>
+                    <circle cx="${cx + 11}" cy="${cy - 1}" r="3.2" fill="#2b3a4a"/>
+                    <ellipse cx="${cx - 18}" cy="${cy + 7}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <ellipse cx="${cx + 18}" cy="${cy + 7}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <path d="M${cx - 8} ${cy + 9} C${cx - 8} ${cy + 18} ${cx + 8} ${cy + 18} ${cx + 8} ${cy + 9} Z" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
+                `;
+            } else if (expression === 'sleep') {
+                eyesAndMouth = `
+                    <path d="M${cx - 15} ${cy} Q${cx - 11} ${cy + 4} ${cx - 7} ${cy}" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
+                    <path d="M${cx + 7} ${cy} Q${cx + 11} ${cy + 4} ${cx + 15} ${cy}" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
+                    <ellipse cx="${cx - 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.75"/>
+                    <ellipse cx="${cx + 18}" cy="${cy + 8}" rx="5" ry="3.2" fill="#fda4af" opacity="0.75"/>
+                    <ellipse cx="${cx}" cy="${cy + 12}" rx="3.5" ry="2.8" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.2"/>
+                `;
+            } else {
+                // 기본 밝은 웃음
+                eyesAndMouth = `
+                    <path d="M${cx - 15} ${cy - 7} Q${cx - 11} ${cy - 10} ${cx - 7} ${cy - 7}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <path d="M${cx + 7} ${cy - 7} Q${cx + 11} ${cy - 10} ${cx + 15} ${cy - 7}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                    <circle cx="${cx - 11}" cy="${cy - 1}" r="3.2" fill="#2b3a4a"/>
+                    <circle cx="${cx + 11}" cy="${cy - 1}" r="3.2" fill="#2b3a4a"/>
+                    <ellipse cx="${cx - 18}" cy="${cy + 7}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <ellipse cx="${cx + 18}" cy="${cy + 7}" rx="5" ry="3.2" fill="#fda4af" opacity="0.8"/>
+                    <path d="M${cx - 6} ${cy + 10} Q${cx} ${cy + 16} ${cx + 6} ${cy + 10}" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                `;
+            }
+
+            return `
+                <!-- 양쪽 귀 (귀 아래 머리카락 없음) -->
+                <circle cx="${cx - 29}" cy="${cy + 3}" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
+                <circle cx="${cx + 29}" cy="${cy + 3}" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
+                <!-- 얼굴 윤곽 -->
+                <circle cx="${cx}" cy="${cy}" r="29" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
+                <!-- 짧은 뾰족 남자아이 윗머리 (귀 위에서 깔끔히 끝남) -->
+                <path d="M${cx - 28} ${cy - 4}
+                         C${cx - 31} ${cy - 24} ${cx - 18} ${cy - 34} ${cx - 7} ${cy - 32}
+                         L${cx - 4} ${cy - 40}
+                         L${cx + 3} ${cy - 33}
+                         L${cx + 10} ${cy - 39}
+                         L${cx + 13} ${cy - 31}
+                         C${cx + 24} ${cy - 31} ${cx + 31} ${cy - 20} ${cx + 28} ${cy - 4}
+                         L${cx + 25} ${cy - 11}
+                         L${cx + 18} ${cy - 17}
+                         L${cx + 13} ${cy - 11}
+                         L${cx + 6} ${cy - 18}
+                         L${cx} ${cy - 11}
+                         L${cx - 7} ${cy - 18}
+                         L${cx - 14} ${cy - 11}
+                         L${cx - 21} ${cy - 16}
+                         L${cx - 25} ${cy - 10} Z"
+                      fill="#3b2820" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                ${eyesAndMouth}
+            `;
+        }
+
         const ILLUSTRATIONS = {
-            // 밥 / 아침 / 점심 / 저녁 / 먹기 / 간식
+            // 1. 밥 / 아침 / 점심 / 저녁 / 먹기 / 간식 (남자아이)
             eat: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <path d="M62 66 C60 32 140 32 138 66 L142 96 C142 104 134 108 128 106 L72 106 C66 108 58 104 58 96 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="100" cy="75" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M70 68 C75 44 125 44 130 68 C122 58 110 64 100 58 C90 64 78 58 70 68 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <circle cx="77" cy="60" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <path d="M84 76 Q89 72 94 76" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
-                <path d="M106 76 Q111 72 116 76" stroke="#2b3a4a" stroke-width="2.8" stroke-linecap="round"/>
-                <ellipse cx="81" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <ellipse cx="119" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <path d="M95 86 Q100 91 105 86" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
-                <path d="M76 105 L124 105 L130 132 L70 132 Z" fill="#fef08a" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <path d="M74 114 Q62 110 66 96 L78 96" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <line x1="65" y1="95" x2="88" y2="90" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round"/>
-                <ellipse cx="90" cy="89" rx="7" ry="4.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5"/>
+                ${renderBoyHead(100, 74, 'happyEat')}
+                <!-- 스포티 하늘색 티셔츠 & 별 와펜 -->
+                <path d="M74 103 L126 103 L132 132 L68 132 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M92 103 Q100 109 108 103" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/>
+                <!-- 숟가락 든 왼팔 -->
+                <path d="M73 113 Q60 109 65 95 L77 95" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="64" y1="94" x2="88" y2="89" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round"/>
+                <ellipse cx="90" cy="88" rx="7" ry="4.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5"/>
+                <!-- 식탁 아래 다리 & 네이비 반바지 -->
                 <rect x="82" y="156" width="12" height="26" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="106" y="156" width="12" height="26" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
+                <!-- 원목 식탁 -->
                 <rect x="34" y="128" width="132" height="14" rx="5" fill="#d4a373" stroke="#2b3a4a" stroke-width="3.2"/>
                 <rect x="44" y="142" width="10" height="40" rx="2" fill="#bc8a5f" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="146" y="142" width="10" height="40" rx="2" fill="#bc8a5f" stroke="#2b3a4a" stroke-width="3"/>
+                <!-- 밥그릇, 국그릇, 반찬 -->
                 <path d="M110 128 C110 116 138 116 138 128 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.6"/>
-                <path d="M108 128 L140 128 L135 138 L113 138 Z" fill="#93c5fd" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="M108 128 L140 128 L135 138 L113 138 Z" fill="#3b82f6" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
                 <path d="M56 128 L88 128 L83 138 L61 138 Z" fill="#fb923c" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
                 <ellipse cx="99" cy="133" rx="11" ry="5" fill="#fca5a5" stroke="#2b3a4a" stroke-width="2.4"/>
             </svg>`,
 
-            // 세수 / 양치 / 치카 / 씻기 / 샤워 / 목욕
+            // 2. 세수 / 양치 / 치카 / 씻기 / 샤워 / 목욕 (남자아이)
             wash: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <!-- 반짝이 & 비눗방울 -->
                 <path d="M46 86 L49 78 L52 86 L60 89 L52 92 L49 100 L46 92 L38 89 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
                 <circle cx="152" cy="76" r="5" fill="#bae6fd" stroke="#2b3a4a" stroke-width="2"/>
                 <circle cx="162" cy="92" r="3.5" fill="#bae6fd" stroke="#2b3a4a" stroke-width="1.8"/>
-                <path d="M62 66 C60 32 140 32 138 66 L142 96 C142 104 134 108 128 106 L72 106 C66 108 58 104 58 96 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="100" cy="75" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M70 68 C75 44 125 44 130 68 C122 58 110 64 100 58 C90 64 78 58 70 68 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <circle cx="77" cy="60" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <circle cx="88" cy="75" r="3.2" fill="#2b3a4a"/>
-                <circle cx="112" cy="75" r="3.2" fill="#2b3a4a"/>
-                <ellipse cx="81" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <ellipse cx="119" cy="83" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <rect x="92" y="84" width="16" height="8" rx="4" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.4"/>
-                <circle cx="91" cy="89" r="3.5" fill="#ffffff" stroke="#2b3a4a" stroke-width="1.8"/>
-                <path d="M74 105 L126 105 L132 142 L68 142 Z" fill="#fbcfe8" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <path d="M74 114 Q58 106 68 92 L82 90" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
-                <line x1="64" y1="88" x2="100" y2="87" stroke="#f43f5e" stroke-width="4.5" stroke-linecap="round"/>
-                <rect x="116" y="106" width="16" height="20" rx="3" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.6"/>
+                ${renderBoyHead(100, 74, 'brush')}
+                <!-- 민트/블루 티셔츠 -->
+                <path d="M72 103 L128 103 L134 142 L66 142 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M92 103 Q100 109 108 103" stroke="#0369a1" stroke-width="3" stroke-linecap="round"/>
+                <!-- 칫솔 잡은 손 & 칫솔 -->
+                <path d="M73 113 Q57 105 67 91 L81 89" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
+                <line x1="63" y1="87" x2="100" y2="86" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+                <!-- 양치 컵 -->
+                <rect x="116" y="106" width="16" height="20" rx="3" fill="#facc15" stroke="#2b3a4a" stroke-width="2.6"/>
+                <!-- 세수 대야 & 치약 -->
                 <ellipse cx="96" cy="146" rx="44" ry="12" fill="#e0f2fe" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M52 146 L62 174 C76 182 116 182 130 174 L140 146 Z" fill="#93c5fd" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M52 146 L62 174 C76 182 116 182 130 174 L140 146 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
                 <path d="M138 172 L158 166 L161 175 L140 179 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
             </svg>`,
 
-            // 옷 / 입기 / 갈아입기 / 외투 / 양말
+            // 3. 옷 / 입기 / 갈아입기 / 외투 / 양말 (남자아이)
             dress: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <path d="M62 60 C60 26 140 26 138 60 L142 90 C142 98 134 102 128 100 L72 100 C66 102 58 98 58 90 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="100" cy="69" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M70 62 C75 38 125 38 130 62 C122 52 110 58 100 52 C90 58 78 52 70 62 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <circle cx="77" cy="54" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <circle cx="88" cy="69" r="3.2" fill="#2b3a4a"/>
-                <circle cx="112" cy="69" r="3.2" fill="#2b3a4a"/>
-                <ellipse cx="81" cy="77" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <ellipse cx="119" cy="77" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <path d="M94 80 Q100 86 106 80" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
+                ${renderBoyHead(100, 68, 'smile')}
+                <!-- 다리 & 네이비 반바지 -->
                 <rect x="84" y="144" width="12" height="32" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="104" y="144" width="12" height="32" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
-                <path d="M78 132 L122 132 L124 152 L102 152 L100 144 L98 152 L76 152 Z" fill="#1e3a5f" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M76 99 L124 99 L146 112 L138 126 L122 118 L122 136 L78 136 L78 118 L64 126 L56 112 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="100" cy="117" r="6" fill="#f59e0b" stroke="#2b3a4a" stroke-width="2"/>
-                <circle cx="146" cy="120" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
-                <circle cx="58" cy="120" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
-                <path d="M36 164 L64 156 L72 174 L44 180 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="M78 132 L122 132 L124 152 L102 152 L100 144 L98 152 L76 152 Z" fill="#1e3a8a" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                <!-- 노란 스포티 티셔츠 입는 중 -->
+                <path d="M75 97 L125 97 L147 110 L139 124 L123 116 L123 136 L77 136 L77 116 L63 124 L55 110 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <!-- 티셔츠 앞면 파란 별 포인트 -->
+                <path d="M100 109 L102.5 114 L108 114.8 L104 118.5 L105 124 L100 121.3 L95 124 L96 118.5 L92 114.8 L97.5 114 Z" fill="#3b82f6" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
+                <circle cx="146" cy="118" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <circle cx="58" cy="118" r="6" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 바닥에 놓인 옷 -->
+                <path d="M36 164 L64 156 L72 174 L44 180 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
                 <path d="M132 162 L160 158 L166 178 L138 180 Z" fill="#334155" stroke="#2b3a4a" stroke-width="2.6" stroke-linejoin="round"/>
             </svg>`,
 
-            // 가방 / 챙기기 / 등원 / 준비물 / 학교 / 유치원
+            // 4. 가방 / 챙기기 / 등원 / 준비물 / 학교 / 유치원 (남자아이)
             bag: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
+                <!-- 반짝이 별 -->
                 <path d="M46 112 L49 104 L52 112 L60 115 L52 118 L49 126 L46 118 L38 115 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
                 <path d="M150 60 L152 54 L154 60 L160 62 L154 64 L152 70 L150 64 L144 62 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="1.8" stroke-linejoin="round"/>
-                <rect x="108" y="96" width="34" height="44" rx="12" fill="#facc15" stroke="#2b3a4a" stroke-width="3.2"/>
-                <rect x="116" y="114" width="20" height="18" rx="6" fill="#fef08a" stroke="#2b3a4a" stroke-width="2.4"/>
-                <path d="M62 60 C60 26 140 26 138 60 L142 90 C142 98 134 102 128 100 L72 100 C66 102 58 98 58 90 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="100" cy="69" r="30" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M70 62 C75 38 125 38 130 62 C122 52 110 58 100 52 C90 58 78 52 70 62 Z" fill="#5c3d2e" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <circle cx="77" cy="54" r="5" fill="#fde047" stroke="#2b3a4a" stroke-width="2"/>
-                <circle cx="88" cy="68" r="3.2" fill="#2b3a4a"/>
-                <circle cx="112" cy="68" r="3.2" fill="#2b3a4a"/>
-                <ellipse cx="81" cy="76" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <ellipse cx="119" cy="76" rx="5.5" ry="3.5" fill="#fda4af" opacity="0.85"/>
-                <path d="M92 78 C92 87 108 87 108 78 Z" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.4" stroke-linejoin="round"/>
-                <path d="M120 108 Q144 96 148 76" stroke="#ffe1cc" stroke-width="11" stroke-linecap="round"/>
-                <path d="M120 108 Q144 96 148 76" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
-                <circle cx="149" cy="73" r="7" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 파란 백팩 -->
+                <rect x="108" y="96" width="34" height="44" rx="12" fill="#3b82f6" stroke="#2b3a4a" stroke-width="3.2"/>
+                <rect x="116" y="114" width="20" height="18" rx="6" fill="#93c5fd" stroke="#2b3a4a" stroke-width="2.4"/>
+                ${renderBoyHead(100, 68, 'bigLaugh')}
+                <!-- 흔드는 오른손 -->
+                <path d="M120 107 Q144 95 148 75" stroke="#ffe1cc" stroke-width="11" stroke-linecap="round"/>
+                <path d="M120 107 Q144 95 148 75" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <circle cx="149" cy="72" r="7" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 다리 & 파란 운동화 -->
                 <rect x="84" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
                 <rect x="104" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
-                <rect x="80" y="170" width="18" height="10" rx="5" fill="#f43f5e" stroke="#2b3a4a" stroke-width="2.8"/>
-                <rect x="102" y="170" width="18" height="10" rx="5" fill="#f43f5e" stroke="#2b3a4a" stroke-width="2.8"/>
-                <path d="M78 134 L122 134 L124 154 L102 154 L100 146 L98 154 L76 154 Z" fill="#1e3a5f" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M76 99 L124 99 L124 136 L76 136 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <path d="M84 99 L84 132" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
-                <path d="M116 99 L116 132" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+                <rect x="80" y="170" width="18" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="102" y="170" width="18" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 네이비 반바지 -->
+                <path d="M78 134 L122 134 L124 154 L102 154 L100 146 L98 154 L76 154 Z" fill="#1e3a8a" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                <!-- 노란 티셔츠 & 백팩 어깨끈 -->
+                <path d="M75 97 L125 97 L125 136 L75 136 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M84 97 L84 132" stroke="#1d4ed8" stroke-width="5.5" stroke-linecap="round"/>
+                <path d="M116 97 L116 132" stroke="#1d4ed8" stroke-width="5.5" stroke-linecap="round"/>
             </svg>`,
 
-            // 책 / 공부 / 독서 / 숙제 / 한글 / 수학 / 피아노 / 영어
+            // 5. 책 / 공부 / 독서 / 숙제 / 한글 / 수학 / 피아노 / 영어 (책 읽는 남자아이)
             study: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="96" r="64" fill="#e0f2fe"/>
-                <!-- 펼쳐진 책 -->
-                <path d="M38 118 Q68 106 100 120 Q132 106 162 118 L156 164 Q128 152 100 164 Q72 152 44 164 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
-                <path d="M34 124 L44 164 Q72 154 100 166 Q128 154 156 164 L166 124" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-                <line x1="100" y1="120" x2="100" y2="164" stroke="#2b3a4a" stroke-width="3"/>
-                <line x1="56" y1="132" x2="86" y2="132" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
-                <line x1="58" y1="144" x2="84" y2="144" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
-                <line x1="114" y1="132" x2="144" y2="132" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
-                <line x1="116" y1="144" x2="142" y2="144" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
-                <!-- 큰 노란 연필 -->
-                <g transform="rotate(-24 118 76)">
-                    <rect x="92" y="34" width="22" height="72" rx="4" fill="#facc15" stroke="#2b3a4a" stroke-width="3.2"/>
-                    <rect x="92" y="24" width="22" height="14" rx="4" fill="#fda4af" stroke="#2b3a4a" stroke-width="3.2"/>
-                    <path d="M92 106 L103 128 L114 106 Z" fill="#fde68a" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                    <path d="M99 120 L103 128 L107 120 Z" fill="#2b3a4a"/>
-                </g>
+                ${renderBoyHead(100, 68, 'smile')}
+                <!-- 초록 티셔츠 -->
+                <path d="M72 97 L128 97 L134 134 L66 134 Z" fill="#4ade80" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <!-- 펼쳐진 동화책 -->
+                <path d="M44 124 Q72 114 100 126 Q128 114 156 124 L150 170 Q124 160 100 170 Q76 160 50 170 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M40 128 L50 170 Q76 162 100 172 Q124 162 150 170 L160 128" stroke="#3b82f6" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="100" y1="126" x2="100" y2="170" stroke="#2b3a4a" stroke-width="2.8"/>
+                <line x1="60" y1="138" x2="88" y2="138" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="62" y1="150" x2="86" y2="150" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="112" y1="138" x2="140" y2="138" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/>
+                <line x1="114" y1="150" x2="138" y2="150" stroke="#94a3b8" stroke-width="2.8" stroke-linecap="round"/>
+                <!-- 책 잡은 양손 -->
+                <circle cx="48" cy="144" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <circle cx="152" cy="144" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
                 <!-- 반짝이 별 -->
-                <path d="M52 54 L56 42 L60 54 L72 58 L60 62 L56 74 L52 62 L40 58 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M152 46 L155 38 L158 46 L166 49 L158 52 L155 60 L152 52 L144 49 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
             </svg>`,
 
-            // 청소 / 정리 / 장난감 / 설거지 / 빨래 / 쓰레기 / 방
+            // 6. 청소 / 정리 / 장난감 / 설거지 / 빨래 / 쓰레기 / 방 (장난감 정리하는 남자아이)
             clean: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="64" fill="#dcfce7"/>
-                <!-- 정리 상자 -->
-                <rect x="46" y="102" width="108" height="62" rx="12" fill="#fbbf24" stroke="#2b3a4a" stroke-width="3.5"/>
-                <rect x="40" y="90" width="120" height="18" rx="6" fill="#f59e0b" stroke="#2b3a4a" stroke-width="3.5"/>
-                <rect x="82" y="118" width="36" height="10" rx="5" fill="#ffffff" stroke="#2b3a4a" stroke-width="2.5"/>
-                <!-- 상자 안 장난감/빗자루 -->
-                <circle cx="72" cy="76" r="16" fill="#fb7185" stroke="#2b3a4a" stroke-width="3"/>
-                <rect x="94" y="56" width="24" height="34" rx="5" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3"/>
-                <path d="M126 90 L144 46" stroke="#92400e" stroke-width="6" stroke-linecap="round"/>
+                ${renderBoyHead(82, 66, 'bigLaugh')}
+                <!-- 주황 티셔츠 -->
+                <path d="M56 95 L108 95 L114 134 L50 134 Z" fill="#fb923c" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <!-- 다리 & 반바지 -->
+                <path d="M56 134 L108 134 L110 154 L84 154 L82 146 L80 154 L54 154 Z" fill="#1e3a8a" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                <rect x="64" y="154" width="11" height="22" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="88" y="154" width="11" height="22" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 장난감 상자에 블록 넣는 팔 -->
+                <path d="M104 106 L132 114" stroke="#ffe1cc" stroke-width="10" stroke-linecap="round"/>
+                <path d="M104 106 L132 114" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
+                <rect x="128" y="102" width="18" height="18" rx="4" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.6"/>
+                <!-- 장난감 정리 상자 -->
+                <rect x="114" y="128" width="56" height="46" rx="8" fill="#facc15" stroke="#2b3a4a" stroke-width="3.2"/>
+                <rect x="110" y="120" width="64" height="12" rx="4" fill="#f59e0b" stroke="#2b3a4a" stroke-width="3"/>
+                <circle cx="152" cy="112" r="10" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.6"/>
                 <!-- 반짝이 -->
-                <path d="M52 48 L55 38 L58 48 L68 51 L58 54 L55 64 L52 54 L42 51 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M154 70 L157 62 L160 70 L168 73 L160 76 L157 84 L154 76 L146 73 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M156 64 L159 56 L162 64 L170 67 L162 70 L159 78 L156 70 L148 67 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
             </svg>`,
 
-            // 약 / 물 / 비타민 / 영양제 / 우유 / 마시기
+            // 7. 약 / 물 / 비타민 / 영양제 / 우유 / 마시기 (물 마시는 남자아이)
             health: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="64" fill="#e0f2fe"/>
-                <!-- 물컵 -->
-                <path d="M62 72 L124 72 L114 156 C113 162 108 166 102 166 L84 166 C78 166 73 162 72 156 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
-                <path d="M67 104 L119 104 L113 154 C112 159 108 162 102 162 L84 162 C78 162 74 159 73 154 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3"/>
-                <!-- 웃는 표정 -->
-                <circle cx="84" cy="126" r="3" fill="#2b3a4a"/>
-                <circle cx="102" cy="126" r="3" fill="#2b3a4a"/>
-                <path d="M89 133 Q93 138 97 133" stroke="#2b3a4a" stroke-width="2.6" stroke-linecap="round"/>
-                <!-- 빨대 -->
-                <path d="M104 72 L118 38 L142 38" stroke="#fb7185" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                <!-- 비타민/하트 -->
-                <circle cx="146" cy="134" r="18" fill="#fde047" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M138 134 H154 M146 126 V142" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                ${renderBoyHead(100, 68, 'happyEat')}
+                <!-- 파란 티셔츠 -->
+                <path d="M72 97 L128 97 L134 146 L66 146 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <!-- 컵 잡은 양팔 -->
+                <path d="M72 112 Q64 126 84 128" stroke="#ffe1cc" stroke-width="10" stroke-linecap="round"/>
+                <path d="M72 112 Q64 126 84 128" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path d="M128 112 Q136 126 116 128" stroke="#ffe1cc" stroke-width="10" stroke-linecap="round"/>
+                <path d="M128 112 Q136 126 116 128" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <!-- 큰 물컵 & 빨대 -->
+                <path d="M84 112 L116 112 L112 158 C111 163 107 166 102 166 L98 166 C93 166 89 163 88 158 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M86 128 L114 128 L111 157 C110 161 107 163 102 163 L98 163 C93 163 90 161 89 157 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.6"/>
+                <path d="M100 112 L100 84" stroke="#f43f5e" stroke-width="5" stroke-linecap="round"/>
+                <!-- 반짝이 물방울 -->
+                <circle cx="48" cy="96" r="5" fill="#bae6fd" stroke="#2b3a4a" stroke-width="2"/>
+                <circle cx="152" cy="92" r="6" fill="#bae6fd" stroke="#2b3a4a" stroke-width="2"/>
             </svg>`,
 
-            // 운동 / 산책 / 놀이터 / 줄넘기 / 자전거 / 공원
+            // 8. 운동 / 산책 / 놀이터 / 줄넘기 / 자전거 / 공원 (공 차며 달리는 남자아이)
             exercise: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="64" fill="#fef3c7"/>
-                <!-- 귀여운 운동화 -->
-                <path d="M44 134 C44 114 66 104 82 92 L106 112 C116 118 134 118 152 126 C160 130 162 142 154 148 L48 148 C44 148 44 142 44 134 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
-                <rect x="44" y="146" width="114" height="14" rx="7" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.5"/>
-                <line x1="88" y1="104" x2="96" y2="112" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-                <line x1="98" y1="112" x2="106" y2="120" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-                <!-- 축구공 / 해 -->
-                <circle cx="136" cy="68" r="24" fill="#fb923c" stroke="#2b3a4a" stroke-width="3.2"/>
-                <path d="M114 68 H158 M136 44 V92" stroke="#2b3a4a" stroke-width="2.4"/>
-                <!-- 바람선 -->
-                <path d="M34 86 H64 M42 74 H60" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+                ${renderBoyHead(92, 64, 'bigLaugh')}
+                <!-- 스포티 레드/화이트 티셔츠 -->
+                <path d="M66 93 L118 93 L122 130 L62 130 Z" fill="#f87171" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M66 104 L46 92" stroke="#ffe1cc" stroke-width="10" stroke-linecap="round"/>
+                <path d="M66 104 L46 92" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
+                <path d="M118 104 L138 92" stroke="#ffe1cc" stroke-width="10" stroke-linecap="round"/>
+                <path d="M118 104 L138 92" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
+                <!-- 네이비 반바지 -->
+                <path d="M66 130 L118 130 L122 148 L94 148 L92 140 L90 148 L62 148 Z" fill="#1e3a8a" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                <!-- 달리는 다리 & 파란 운동화 -->
+                <rect x="68" y="148" width="12" height="22" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="104" y="148" width="12" height="22" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="62" y="168" width="20" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="102" y="168" width="20" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 축구공 -->
+                <circle cx="148" cy="156" r="18" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2"/>
+                <polygon points="148,147 155,152 152,160 144,160 141,152" fill="#2b3a4a"/>
             </svg>`,
 
-            // 잠 / 취침 / 이불 / 자장 / 꿈 / 눕기
+            // 9. 잠 / 취침 / 이불 / 자장 / 꿈 / 눕기 (이불 덮고 자는 남자아이)
             sleep: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="64" fill="#e0e7ff"/>
-                <!-- 노란 초승달 -->
-                <path d="M126 52 C100 50 78 72 78 100 C78 128 100 150 128 148 C142 147 154 140 162 130 C142 134 118 120 116 96 C114 78 120 62 126 52 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.5" stroke-linejoin="round"/>
-                <!-- 구름 베개 -->
-                <path d="M44 148 C36 148 32 136 40 130 C38 118 52 110 64 116 C72 106 94 110 96 124 C106 124 110 148 96 148 Z" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
-                <!-- 별 & Zzz -->
-                <path d="M56 66 L59 56 L62 66 L72 69 L62 72 L59 82 L56 72 L46 69 Z" fill="#facc15" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
-                <text x="128" y="84" font-family="Jua, sans-serif" font-size="24" font-weight="bold" fill="#4f46e5">Zzz</text>
+                <!-- 밤하늘 초승달 & 별 -->
+                <path d="M154 36 C138 35 126 48 126 64 C126 80 138 92 154 91 C162 90 169 86 174 80 C162 82 149 74 148 60 C147 50 150 41 154 36 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2.8" stroke-linejoin="round"/>
+                <text x="128" y="112" font-family="Jua, sans-serif" font-size="22" font-weight="bold" fill="#4f46e5">Zzz</text>
+                <!-- 폭신한 베개 -->
+                <rect x="44" y="64" width="104" height="54" rx="18" fill="#ffffff" stroke="#2b3a4a" stroke-width="3.2"/>
+                ${renderBoyHead(96, 84, 'sleep')}
+                <!-- 파란 별무늬 이불 -->
+                <path d="M40 116 Q96 106 152 116 L158 174 L34 174 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M40 116 Q96 106 152 116 L154 130 Q96 120 38 130 Z" fill="#dbeafe" stroke="#2b3a4a" stroke-width="2.8" stroke-linejoin="round"/>
+                <path d="M96 140 L99 147 L106 148 L101 153 L102 160 L96 156 L90 160 L91 153 L86 148 L93 147 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
             </svg>`,
 
-            // 기본 귀여운 응원 별 마스코트 (매칭 키워드가 없을 때)
+            // 10. 기본 만세 응원하는 남자아이 (매칭 키워드가 없을 때)
             default: `
             <svg class="w-full h-full max-w-[165px] max-h-[165px]" viewBox="0 0 200 200" fill="none">
-                <circle cx="100" cy="100" r="64" fill="#fef9c3"/>
-                <path d="M100 38 L117 74 L156 79 L128 106 L135 145 L100 126 L65 145 L72 106 L44 79 L83 74 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="3.8" stroke-linejoin="round"/>
-                <circle cx="86" cy="96" r="4" fill="#2b3a4a"/>
-                <circle cx="114" cy="96" r="4" fill="#2b3a4a"/>
-                <ellipse cx="77" cy="104" rx="5.5" ry="3.2" fill="#fb7185" opacity="0.8"/>
-                <ellipse cx="123" cy="104" rx="5.5" ry="3.2" fill="#fb7185" opacity="0.8"/>
-                <path d="M93 107 Q100 114 107 107" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="48" cy="52" r="6" fill="#60a5fa" stroke="#2b3a4a" stroke-width="2.2"/>
-                <circle cx="154" cy="54" r="5" fill="#fb7185" stroke="#2b3a4a" stroke-width="2.2"/>
-                <circle cx="152" cy="146" r="6" fill="#4ade80" stroke="#2b3a4a" stroke-width="2.2"/>
+                <!-- 반짝이 별 -->
+                <path d="M44 64 L47 56 L50 64 L58 67 L50 70 L47 78 L44 70 L36 67 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M154 62 L157 54 L160 62 L168 65 L160 68 L157 76 L154 68 L146 65 Z" fill="#38bdf8" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
+                ${renderBoyHead(100, 68, 'bigLaugh')}
+                <!-- 만세 하는 양팔 -->
+                <path d="M74 106 Q54 92 50 74" stroke="#ffe1cc" stroke-width="11" stroke-linecap="round"/>
+                <path d="M74 106 Q54 92 50 74" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <circle cx="49" cy="71" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <path d="M126 106 Q146 92 150 74" stroke="#ffe1cc" stroke-width="11" stroke-linecap="round"/>
+                <path d="M126 106 Q146 92 150 74" stroke="#2b3a4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <circle cx="151" cy="71" r="6.5" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 다리 & 파란 운동화 -->
+                <rect x="84" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
+                <rect x="104" y="148" width="12" height="24" rx="4" fill="#ffe1cc" stroke="#2b3a4a" stroke-width="3"/>
+                <rect x="80" y="170" width="18" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <rect x="102" y="170" width="18" height="10" rx="5" fill="#2563eb" stroke="#2b3a4a" stroke-width="2.8"/>
+                <!-- 네이비 반바지 -->
+                <path d="M78 134 L122 134 L124 154 L102 154 L100 146 L98 154 L76 154 Z" fill="#1e3a8a" stroke="#2b3a4a" stroke-width="3" stroke-linejoin="round"/>
+                <!-- 파란 티셔츠 & 노란 별 -->
+                <path d="M75 97 L125 97 L125 136 L75 136 Z" fill="#60a5fa" stroke="#2b3a4a" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M100 108 L103 114 L110 115 L105 119.5 L106 126 L100 123 L94 126 L95 119.5 L90 115 L97 114 Z" fill="#fde047" stroke="#2b3a4a" stroke-width="2" stroke-linejoin="round"/>
             </svg>`
         };
 
         /**
-         * 할 일 제목의 키워드에 맞춰 가장 어울리는 동화풍 SVG 일러스트를 반환합니다.
+         * 할 일 제목의 키워드에 맞춰 남자아이 SVG 일러스트를 반환합니다.
          */
         function getIllustrationForTask(taskTitle) {
             const t = (taskTitle || '').toLowerCase();
@@ -811,7 +902,7 @@
         }
 
         /**
-         * 담당자('누구') 이름별로 아이도 한눈에 구분할 수 있는 컬러 배지 클래스를 반환합니다.
+         * 담당자('누구') 이름별로 컬러 배지 스타일을 반환합니다.
          */
         function getWhoBadgeStyle(who) {
             const name = (who || '가족').trim();
@@ -825,7 +916,6 @@
                 return { bg: 'bg-[#d1fae5]', text: 'text-[#047857]', border: 'border-[#34d399]', dot: 'bg-[#10b981]' };
             }
 
-            // 아이 이름 등 기타 이름은 문자열 해시로 항상 동일한 밝은 컬러 부여
             const palette = [
                 { bg: 'bg-[#fef3c7]', text: 'text-[#b45309]', border: 'border-[#fbbf24]', dot: 'bg-[#f59e0b]' },
                 { bg: 'bg-[#f3e8ff]', text: 'text-[#7e22ce]', border: 'border-[#c084fc]', dot: 'bg-[#a855f7]' },
@@ -842,11 +932,8 @@
         /* =========================================================================
            4. 안전한 CSV 파서 & 구글 시트 동기화 (5분 주기 + 오프라인 캐시 폴백)
         ========================================================================= */
-        /**
-         * 따옴표("..."), 이스케이프 따옴표(""), 따옴표 내부 쉼표/줄바꿈을 안전하게 파싱합니다.
-         */
         function parseCSVText(rawText) {
-            const text = (rawText || '').replace(/^\uFEFF/, ''); // UTF-8 BOM 제거
+            const text = (rawText || '').replace(/^\uFEFF/, '');
             const rows = [];
             let currentRow = [];
             let currentField = '';
@@ -859,7 +946,7 @@
                 if (inQuotes) {
                     if (ch === '"' && next === '"') {
                         currentField += '"';
-                        i++; // 이스케이프 따옴표 건너뜀
+                        i++;
                     } else if (ch === '"') {
                         inQuotes = false;
                     } else {
@@ -896,9 +983,6 @@
             return rows;
         }
 
-        /**
-         * 첫 행이 헤더인지 판별하고, 빈 행을 제거한 [{ task, who }] 배열을 반환합니다.
-         */
         function extractTasksFromCSV(csvText) {
             const rows = parseCSVText(csvText)
                 .filter(row => row.some(cell => cell.trim() !== ''));
@@ -980,12 +1064,6 @@
             }
         }
 
-        /**
-         * 구글 시트 CSV를 불러옵니다.
-         * 1차: 캐시 방지 타임스탬프(&_ts=) 포함 요청
-         * 2차: 실패 시 원본 URL로 재시도
-         * 실패 시: localStorage 캐시 -> 없을 때만 기본 예시 4개 폴백
-         */
         async function fetchSheetTasks(isManual = false) {
             const icon = document.getElementById('sheet-sync-icon');
             icon.classList.add('inline-block', 'animate-spin');
@@ -999,7 +1077,6 @@
                     res = await fetch(tsUrl, { cache: 'no-store' });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 } catch (firstErr) {
-                    // 타임스탬프 파라미터가 차단되거나 실패 시 원본 URL로 재시도
                     res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 }
@@ -1027,7 +1104,6 @@
                 }
             }
 
-            // 필터로 선택된 사람이 새 시트 목록에 없어졌으면 'ALL'로 복귀
             const uniqueMembers = getUniqueMembers();
             if (activeMemberFilter !== 'ALL' && !uniqueMembers.includes(activeMemberFilter)) {
                 activeMemberFilter = 'ALL';
@@ -1055,7 +1131,6 @@
             return `${y}-${m}-${d}`;
         }
 
-        // 할 일 + 누구 조합 키 (5분마다 시트 재로드 시 체크 상태 유지용)
         function makeTaskKey(task, who) {
             return `${(task || '').trim()}||${(who || '가족').trim()}`;
         }
@@ -1227,7 +1302,6 @@
             const visibleTasks = getFilteredTasks();
             grid.innerHTML = '';
 
-            // 항목이 4개 이하일 때는 1줄에 화면을 꽉 채우고, 5개 이상일 때는 2줄/스크롤로 깔끔하게 배치
             if (visibleTasks.length <= 4) {
                 grid.className = 'w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3';
             } else {
@@ -1246,7 +1320,6 @@
                 return;
             }
 
-            // 아직 안 한 첫 번째 카드 인덱스
             const firstUncheckedIdx = visibleTasks.findIndex(item => !checkState.checkedMap[makeTaskKey(item.task, item.who)]);
 
             visibleTasks.forEach((item, idx) => {
@@ -1260,14 +1333,14 @@
                 card.type = 'button';
                 card.className = [
                     'relative w-full rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 active:scale-[0.98] overflow-hidden text-center',
-                    compactMode ? 'min-h-[215px] lg:min-h-[230px] p-3' : 'h-full min-h-[230px] p-3.5 sm:p-4',
+                    compactMode ? 'min-h-[210px] lg:min-h-[225px] p-3' : 'h-full min-h-[225px] p-3.5 sm:p-4',
                     isDone ? 'bg-[#e6f9ed] ink-border' : 'bg-white ink-border hover:bg-[#fffef8]',
                     isActiveNext ? 'active-task-card' : ''
                 ].join(' ');
 
                 card.addEventListener('click', () => toggleTaskDone(item, idx));
 
-                // 상단 행: 번호 동그라미 + 담당자('누구') 컬러 배지 + ('같이 하자!' / 초록 공룡)
+                // 상단 행
                 const topRow = document.createElement('div');
                 topRow.className = 'w-full flex items-start justify-between gap-1 relative z-10 min-h-[38px]';
 
@@ -1282,7 +1355,6 @@
                 numCircle.textContent = isDone ? '✓' : String(idx + 1);
                 leftGroup.appendChild(numCircle);
 
-                // 담당자('누구') 큰 컬러 배지
                 const whoBadge = document.createElement('span');
                 whoBadge.className = `inline-flex items-center gap-1 ${whoStyle.bg} ${whoStyle.text} border-[1.5px] ${whoStyle.border} rounded-full px-2.5 py-0.5 text-xs sm:text-sm font-black shadow-2xs`;
                 whoBadge.innerHTML = `<span class="w-2 h-2 rounded-full ${whoStyle.dot}"></span><span>${escapeHtml(item.who)}</span>`;
@@ -1304,7 +1376,7 @@
                     topRow.appendChild(dinoWrap);
                 }
 
-                // 중앙 키워드 맞춤 동화풍 일러스트
+                // 중앙 남자아이 일러스트
                 const illusWrap = document.createElement('div');
                 illusWrap.className = [
                     'flex-1 w-full flex items-center justify-center my-1 transition-opacity duration-200 min-h-0',
@@ -1326,7 +1398,6 @@
                 card.appendChild(illusWrap);
                 card.appendChild(titleEl);
 
-                // 완료 스탬프 오버레이
                 if (isDone) {
                     const stamp = document.createElement('div');
                     stamp.className = [
@@ -1500,7 +1571,7 @@
                     const grade = getDustGrade(pm10, pm25);
 
                     const dustPill = document.getElementById('dust-pill');
-                    dustPill.className = `w-14 sm:w-16 shrink-0 rounded-xl ${grade.bg} text-white flex flex-col items-center justify-center py-1 px-1 text-center`;
+                    dustPill.className = `w-13 sm:w-15 shrink-0 rounded-xl ${grade.bg} text-white flex flex-col items-center justify-center py-1 px-1 text-center`;
                     document.getElementById('dust-face').textContent = grade.face;
                     document.getElementById('dust-grade').textContent = grade.label;
                     document.getElementById('w-dust-values').textContent = `미세 ${pm10} · 초미세 ${pm25} ㎍`;
@@ -1508,7 +1579,6 @@
                     document.getElementById('w-dust-values').textContent = '미세먼지 확인 중';
                 }
 
-                // 4개 예보 컬럼: 오늘 8시, 12시, 16시 + 내일
                 const targetHours = [8, 12, 16];
                 const colsContainer = document.getElementById('forecast-cols');
                 colsContainer.innerHTML = '';
@@ -1529,10 +1599,10 @@
                     const info = decodeWMO(wData.hourly.weather_code[h] ?? 0);
 
                     const col = document.createElement('div');
-                    col.className = 'bg-[#f4f7fb] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center';
+                    col.className = 'bg-[#f4f7fb] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center';
                     col.innerHTML = `
                         <span class="text-[10px] font-bold text-[#64748b] leading-none">${h}시</span>
-                        <span class="text-base leading-none my-0.5">${info.icon}</span>
+                        <span class="text-sm sm:text-base leading-none my-0.5">${info.icon}</span>
                         <span class="text-xs font-black text-[#2b3a4a] leading-none">${t}°</span>
                         <span class="text-[9px] font-bold text-[#2563eb] mt-0.5 leading-none">비 ${p}%</span>
                     `;
@@ -1545,11 +1615,11 @@
                 const tomRain = wData.daily.precipitation_probability_max[1] ?? 0;
 
                 const tomCol = document.createElement('div');
-                tomCol.className = 'bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center';
+                tomCol.className = 'bg-[#fff7e6] border border-[#facc15] rounded-xl py-1 px-0.5 flex flex-col items-center justify-center text-center';
                 tomCol.innerHTML = `
                     <span class="text-[10px] font-extrabold text-[#b45309] leading-none">내일</span>
-                    <span class="text-base leading-none my-0.5">${tomInfo.icon}</span>
-                    <span class="text-[11px] font-black text-[#2b3a4a] leading-none">${tomMin}/${tomMax}°</span>
+                    <span class="text-sm sm:text-base leading-none my-0.5">${tomInfo.icon}</span>
+                    <span class="text-[10px] sm:text-[11px] font-black text-[#2b3a4a] leading-none">${tomMin}/${tomMax}°</span>
                     <span class="text-[9px] font-bold text-[#2563eb] mt-0.5 leading-none">비 ${tomRain}%</span>
                 `;
                 colsContainer.appendChild(tomCol);
@@ -1749,12 +1819,10 @@
             document.getElementById('btn-night-back').addEventListener('click', stopPeek);
             document.getElementById('btn-wakelock').addEventListener('click', requestWakeLock);
 
-            // 첫 터치 시 Wake Lock 자동 요청
             document.addEventListener('pointerdown', () => {
                 if (!wakeLockSentinel) requestWakeLock();
             }, { passive: true });
 
-            // 화면 복귀 시 Wake Lock, 시간, 아침 7시 초기화, 야간 모드 즉시 동기화
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     requestWakeLock();
@@ -1770,7 +1838,6 @@
             loadCheckState();
             bindEvents();
 
-            // 캐시된 목록이 있으면 즉시 먼저 그려서 깜빡임 방지
             const cached = loadCachedSheetTasks();
             if (cached) {
                 sheetTasks = cached.tasks;
@@ -1784,14 +1851,11 @@
             updateNightOverlay();
             requestWakeLock();
 
-            // 구글 시트 및 날씨 최초 로드
             fetchSheetTasks(false);
             fetchWeatherAndDust();
 
-            // 1초마다 시계 & 카운트다운 갱신
             setInterval(updateClock, 1000);
 
-            // 1분마다 아침 7시 체크 초기화 및 야간 모드 확인
             setInterval(() => {
                 checkMorningReset();
                 if (!isNightHours() && isPeeking) {
@@ -1801,10 +1865,7 @@
                 }
             }, 60 * 1000);
 
-            // 5분(300,000ms)마다 구글 시트 CSV 자동 재조회
             setInterval(() => fetchSheetTasks(false), 5 * 60 * 1000);
-
-            // 30분마다 날씨 & 미세먼지 자동 갱신
             setInterval(fetchWeatherAndDust, 30 * 60 * 1000);
         }
 
