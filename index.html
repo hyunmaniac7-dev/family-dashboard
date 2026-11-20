@@ -1,59 +1,1752 @@
-<!-- ... existing code ... -->
-        <!-- 1-B. 헤더 메인: 좌측 아이용 아날로그 시계 + 중앙 레트로 날짜·시계 + 우측 다중 날씨 카드 -->
-        <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-3 px-4 sm:px-5 pb-2 pt-0.5 min-h-0">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>우리집 가족 대시보드</title>
 
-            <!-- 좌측 + 중앙 시계 묶음 -->
-            <div class="flex items-center justify-between sm:justify-start gap-4 sm:gap-7 w-full lg:w-auto shrink-0">
-                <!-- 아이가 읽기 쉬운 큰 원형 아날로그 시계 (빨간 시침 / 파란 분침 / 주황 초침) -->
-                <div class="shrink-0 flex items-center justify-center pl-1">
-                    <svg id="analog-clock-svg" class="w-[118px] h-[118px] sm:w-[132px] sm:h-[132px] xl:w-[144px] xl:h-[144px] drop-shadow-sm" viewBox="0 0 160 160" fill="none" aria-label="아날로그 시계">
-                        <!-- 바깥 테두리 & 크림색 문자판 -->
-                        <circle cx="80" cy="80" r="75" fill="#fffdf7" stroke="#2b3a4a" stroke-width="5"/>
-                        <circle cx="80" cy="80" r="68" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <!-- 홈 화면에 추가 시 주소창 없이 꽉 찬 가로 화면으로 실행 (iOS / Android PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="우리집 대시보드">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#5eb8f5">
+    <link rel="manifest" id="pwa-manifest">
 
-                        <!-- 5분 단위 눈금 & 1~12 숫자 (JS에서 정밀 생성) -->
-                        <g id="analog-ticks"></g>
-                        <g id="analog-numbers"></g>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-                        <!-- 시침 (굵은 빨간색 - 짧은 바늘) -->
-                        <g id="analog-hour-hand" transform="rotate(0 80 80)">
-                            <line x1="80" y1="86" x2="80" y2="43" stroke="#ef4444" stroke-width="7.5" stroke-linecap="round"/>
-                            <line x1="80" y1="86" x2="80" y2="43" stroke="#2b3a4a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
-                        </g>
+    <!-- 한글 둥근 폰트 + 레트로 픽셀 시계 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&family=Silkscreen:wght@700&display=swap" rel="stylesheet">
 
-                        <!-- 분침 (굵은 파란색 - 긴 바늘) -->
-                        <g id="analog-minute-hand" transform="rotate(0 80 80)">
-                            <line x1="80" y1="88" x2="80" y2="25" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round"/>
-                        </g>
+    <style>
+        :root {
+            --ink: #253342;
+            --sky-top: #5ab6f4;
+            --sky-bottom: #8fd4fc;
+            --grass-light: #6ec44f;
+            --grass-dark: #4ea538;
+            --bg-mint: #ebf7df;
+            --card-yellow: #facc15;
+        }
 
-                        <!-- 초침 (주황색 - 얇은 바늘) -->
-                        <g id="analog-second-hand" transform="rotate(0 80 80)">
-                            <line x1="80" y1="94" x2="80" y2="20" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
-                        </g>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-                        <!-- 중앙 핀 캡 -->
-                        <circle cx="80" cy="80" r="7" fill="#facc15" stroke="#2b3a4a" stroke-width="2.5"/>
-                        <circle cx="80" cy="80" r="2.2" fill="#2b3a4a"/>
-                    </svg>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-mint);
+            color: var(--ink);
+        }
+
+        .font-display {
+            font-family: 'Jua', 'Noto Sans KR', sans-serif;
+        }
+
+        .font-pixel {
+            font-family: 'Silkscreen', monospace;
+        }
+
+        /* 굵은 만화책 잉크 테두리 */
+        .ink-border {
+            border: 2.5px solid var(--ink);
+        }
+
+        .ink-border-thin {
+            border: 2px solid var(--ink);
+        }
+
+        /* 상단 하늘 배너 */
+        .sky-banner {
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 픽셀 잔디 띠 */
+        .pixel-grass {
+            height: 12px;
+            background-image:
+                linear-gradient(90deg, var(--grass-light) 50%, var(--grass-dark) 50%),
+                linear-gradient(90deg, #86d865 50%, var(--grass-light) 50%);
+            background-size: 16px 6px, 16px 6px;
+            background-position: 0 0, 8px 6px;
+            background-repeat: repeat-x;
+            border-top: 2.5px solid var(--ink);
+            border-bottom: 2.5px solid var(--ink);
+        }
+
+        /* 레트로 외곽선 텍스트 */
+        .date-stroke {
+            color: #ffffff;
+            -webkit-text-stroke: 2px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 0 3px 0 rgba(37, 51, 66, 0.25);
+        }
+
+        .ampm-stroke {
+            color: #fff8d6;
+            -webkit-text-stroke: 2px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 0 2px 0 rgba(37, 51, 66, 0.22);
+        }
+
+        .clock-stroke {
+            color: #ffffff;
+            -webkit-text-stroke: 4px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 0 5px 0 rgba(37, 51, 66, 0.28);
+        }
+
+        /* 콜론 깜빡임 */
+        @keyframes blinkSoft {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0.28; }
+        }
+        .colon-blink {
+            animation: blinkSoft 1.2s infinite;
+        }
+
+        /* 상단 알약 버튼 */
+        .nav-pill {
+            border: 2px solid var(--ink);
+            border-radius: 9999px;
+            font-weight: 800;
+            transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 2px 0 rgba(37, 51, 66, 0.22);
+            white-space: nowrap;
+        }
+        .nav-pill:active {
+            transform: translateY(1.5px);
+            box-shadow: 0 0.5px 0 rgba(37, 51, 66, 0.22);
+        }
+
+        /* 할 일 카드 */
+        .task-card {
+            background: #ffffff;
+            border: 2.5px solid var(--ink);
+            border-radius: 20px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 0 rgba(37, 51, 66, 0.14);
+            cursor: pointer;
+            position: relative;
+        }
+        .task-card:active {
+            transform: scale(0.97);
+        }
+        .task-card.is-next {
+            border: 3.5px solid #f59e0b;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.35), 0 5px 0 rgba(217, 119, 6, 0.25);
+        }
+        .task-card.is-done {
+            background: #f3f9ee;
+            border-color: #65a30d;
+        }
+
+        /* 진행 바 마스코트 통통 튀기 */
+        @keyframes hop {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+        .mascot-hop {
+            animation: hop 1.4s ease-in-out infinite;
+        }
+
+        /* 카드 스크롤바 숨김 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 칭찬 토스트 */
+        @keyframes popToast {
+            0% { opacity: 0; transform: translate(-50%, 16px) scale(0.9); }
+            15% { opacity: 1; transform: translate(-50%, 0) scale(1.03); }
+            25% { transform: translate(-50%, 0) scale(1); }
+            85% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+        }
+        .toast-show {
+            animation: popToast 2.2s ease forwards;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- ==================== 메인 대시보드 ==================== -->
+    <div id="dashboard-root" class="flex flex-col w-full h-full min-h-0">
+
+        <!-- 1. 상단 하늘 배너 -->
+        <header class="sky-banner shrink-0 flex flex-col">
+            <!-- 배경 픽셀 구름 장식 -->
+            <div class="pointer-events-none absolute inset-0 overflow-hidden opacity-80">
+                <div class="absolute top-12 left-[28%] w-16 h-4 bg-white rounded-full"></div>
+                <div class="absolute top-10 left-[30%] w-9 h-4 bg-white rounded-full"></div>
+                <div class="absolute top-20 left-[44%] w-12 h-3.5 bg-white rounded-full opacity-90"></div>
+                <div class="absolute top-14 right-[10%] w-20 h-4 bg-white rounded-full opacity-75"></div>
+            </div>
+
+            <!-- 1-A. 상단 네비게이션 알약 바 -->
+            <nav class="relative z-20 flex items-center justify-between gap-2 px-3 sm:px-5 pt-2.5 pb-1.5 overflow-x-auto no-scrollbar">
+                <!-- 왼쪽: 모드 배지(유치원 / 가족 할 일) + 담당자 필터 탭 -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <!-- 유치원 모드 배지 (family-dashboard의 '유치원' 시트 연동) -->
+                    <button id="tab-kindergarten" type="button"
+                        class="nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-[#fef08a] text-[#253342]">
+                        <span>🏫</span>
+                        <span>유치원</span>
+                    </button>
+
+                    <!-- 기본 가족 할 일 모드 배지 -->
+                    <button id="tab-family" type="button"
+                        class="nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-white/80 text-[#253342] hover:bg-white">
+                        <span>🏠</span>
+                        <span>가족 할 일</span>
+                    </button>
+
+                    <div class="h-5 w-[2px] bg-[#253342]/20 mx-0.5 rounded-full"></div>
+
+                    <!-- 시트에서 자동 추출되는 '누구' 필터 탭 영역 -->
+                    <div id="assignee-filters" class="flex items-center gap-1.5">
+                        <!-- JS 렌더링 -->
+                    </div>
                 </div>
 
-                <!-- 날짜(월/일/요일) + 약 1.5배 확대된 레트로 픽셀 디지털 시계 -->
-                <div class="flex flex-col items-start leading-none">
-                    <div id="clock-date" class="date-stroke font-display text-2xl sm:text-[1.85rem] xl:text-[2.15rem] tracking-wide mb-1 pl-1">
-                        11월 20일 금요일
+                <!-- 오른쪽: 시트 동기화 · 날씨 새로고침 · 야간 미리보기 · 항상 켜짐 -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <button id="btn-sync-sheet" type="button" title="구글 시트 즉시 새로고침"
+                        class="nav-pill px-3 py-1.5 text-xs sm:text-sm bg-white/90 hover:bg-white text-[#253342] flex items-center gap-1">
+                        <span id="sync-icon">📋</span>
+                        <span id="sync-label">불러오는 중...</span>
+                    </button>
+
+                    <button id="btn-refresh-weather" type="button" title="날씨 새로고침"
+                        class="nav-pill px-2.5 py-1.5 text-xs sm:text-sm bg-white/90 hover:bg-white text-[#253342]">
+                        🌤️
+                    </button>
+
+                    <button id="btn-night-preview" type="button" title="야간 암전 화면 미리보기"
+                        class="nav-pill px-3 py-1.5 text-xs sm:text-sm bg-[#334155] hover:bg-[#1e293b] text-white flex items-center gap-1">
+                        <span>🌙</span>
+                        <span class="hidden sm:inline">야간</span>
+                    </button>
+
+                    <button id="btn-wakelock" type="button" title="화면 항상 켜짐 상태"
+                        class="nav-pill px-3 py-1.5 text-xs sm:text-sm bg-[#dcfce7] text-[#166534] flex items-center gap-1">
+                        <span id="wakelock-dot">☀️</span>
+                        <span id="wakelock-text" class="hidden md:inline">항상 켜짐</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 1-B. 헤더 메인: 좌측 아이용 아날로그 시계 + 중앙 레트로 날짜·시계 + 우측 다중 날씨 카드 -->
+            <div class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-3 px-4 sm:px-5 pb-2 pt-0.5 min-h-0">
+
+                <!-- 좌측 + 중앙 시계 묶음 -->
+                <div class="flex items-center justify-between sm:justify-start gap-4 sm:gap-7 w-full lg:w-auto shrink-0">
+                    <!-- 아이가 읽기 쉬운 큰 원형 아날로그 시계 (빨간 시침 / 파란 분침 / 주황 초침) -->
+                    <div class="shrink-0 flex items-center justify-center pl-1">
+                        <svg id="analog-clock-svg" class="w-[118px] h-[118px] sm:w-[132px] sm:h-[132px] xl:w-[144px] xl:h-[144px] drop-shadow-sm" viewBox="0 0 160 160" fill="none" aria-label="아날로그 시계">
+                            <!-- 바깥 테두리 & 크림색 문자판 -->
+                            <circle cx="80" cy="80" r="75" fill="#fffdf7" stroke="#2b3a4a" stroke-width="5"/>
+                            <circle cx="80" cy="80" r="68" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+                            <!-- 5분 단위 눈금 & 1~12 숫자 (JS에서 정밀 생성) -->
+                            <g id="analog-ticks"></g>
+                            <g id="analog-numbers"></g>
+
+                            <!-- 시침 (굵은 빨간색 - 짧은 바늘) -->
+                            <g id="analog-hour-hand" transform="rotate(0 80 80)">
+                                <line x1="80" y1="86" x2="80" y2="43" stroke="#ef4444" stroke-width="7.5" stroke-linecap="round"/>
+                                <line x1="80" y1="86" x2="80" y2="43" stroke="#2b3a4a" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+                            </g>
+
+                            <!-- 분침 (굵은 파란색 - 긴 바늘) -->
+                            <g id="analog-minute-hand" transform="rotate(0 80 80)">
+                                <line x1="80" y1="88" x2="80" y2="25" stroke="#2563eb" stroke-width="5.5" stroke-linecap="round"/>
+                            </g>
+
+                            <!-- 초침 (주황색 - 얇은 바늘) -->
+                            <g id="analog-second-hand" transform="rotate(0 80 80)">
+                                <line x1="80" y1="94" x2="80" y2="20" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+                            </g>
+
+                            <!-- 중앙 핀 캡 -->
+                            <circle cx="80" cy="80" r="7" fill="#facc15" stroke="#2b3a4a" stroke-width="2.5"/>
+                            <circle cx="80" cy="80" r="2.2" fill="#2b3a4a"/>
+                        </svg>
                     </div>
-                    <div class="flex items-baseline gap-2">
-                        <span id="clock-ampm" class="ampm-stroke font-display text-2xl sm:text-[1.75rem] xl:text-[2rem]">오후</span>
-                        <div class="clock-stroke font-pixel text-[3.7rem] sm:text-[4.6rem] xl:text-[5.5rem] tracking-tight flex items-center leading-[0.88]">
-                            <span id="clock-hour">11</span>
-                            <span class="colon-blink mx-0.5 text-[3rem] sm:text-[3.7rem] xl:text-[4.4rem]">:</span>
-                            <span id="clock-min">45</span>
+
+                    <!-- 날짜(월/일/요일) + 약 1.5배 확대된 레트로 픽셀 디지털 시계 -->
+                    <div class="flex flex-col items-start leading-none">
+                        <div id="clock-date" class="date-stroke font-display text-2xl sm:text-[1.85rem] xl:text-[2.15rem] tracking-wide mb-1 pl-1">
+                            11월 21일 토요일
                         </div>
+                        <div class="flex items-baseline gap-2">
+                            <span id="clock-ampm" class="ampm-stroke font-display text-2xl sm:text-[1.75rem] xl:text-[2rem]">오전</span>
+                            <div class="clock-stroke font-pixel text-[3.7rem] sm:text-[4.6rem] xl:text-[5.5rem] tracking-tight flex items-center leading-[0.88]">
+                                <span id="clock-hour">08</span>
+                                <span class="colon-blink mx-0.5 text-[3rem] sm:text-[3.7rem] xl:text-[4.4rem]">:</span>
+                                <span id="clock-min">10</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 우측: 둥근 흰색 다중 패널 날씨 카드 (경기도 시흥시 목감동) -->
+                <div class="w-full lg:w-[54%] xl:w-[53%] bg-white ink-border rounded-[16px] px-3 py-2 shadow-sm flex flex-col justify-between gap-1.5">
+                    <div class="flex items-stretch gap-2">
+                        <!-- 미세먼지 등급 배지 -->
+                        <div id="dust-badge" class="w-[66px] sm:w-[74px] shrink-0 rounded-xl bg-[#22c55e] text-white flex flex-col items-center justify-center py-1.5 px-1 ink-border-thin">
+                            <span class="text-[10px] font-bold opacity-95">미세먼지</span>
+                            <span id="dust-face" class="text-2xl leading-none my-0.5">😊</span>
+                            <span id="dust-grade" class="text-xs sm:text-sm font-black">좋음</span>
+                        </div>
+
+                        <!-- 현재 날씨 & 기온 -->
+                        <div class="flex items-center gap-2 px-1 shrink-0">
+                            <div id="w-current-icon" class="text-4xl sm:text-[2.6rem] leading-none">⛅</div>
+                            <div class="flex flex-col leading-tight">
+                                <div class="flex items-baseline gap-1.5">
+                                    <span id="w-current-temp" class="text-3xl sm:text-[2.15rem] font-black tracking-tight">--°</span>
+                                    <span id="w-current-desc" class="text-sm sm:text-base font-black text-slate-700">불러오는 중</span>
+                                </div>
+                                <div id="w-minmax" class="text-[11px] sm:text-xs font-bold text-slate-600">최고 --° · 최저 --°</div>
+                                <div id="w-dust-detail" class="text-[10px] sm:text-[11px] font-bold text-slate-500">미세 -- · 초미세 -- μg</div>
+                            </div>
+                        </div>
+
+                        <!-- 시간대별 + 내일 예보 4칸 -->
+                        <div id="w-slots" class="flex-1 grid grid-cols-4 gap-1 sm:gap-1.5 min-w-0">
+                            <!-- JS 렌더링 -->
+                        </div>
+                    </div>
+
+                    <!-- 하단 나갈 때 옷차림·우산 팁 -->
+                    <div class="flex items-center gap-2 bg-[#f1f5f9] rounded-lg px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-700 truncate">
+                        <span class="shrink-0 px-1.5 py-0.5 rounded bg-[#ef4444] text-white text-[11px] font-black">나갈 때</span>
+                        <span id="w-outing-tip" class="truncate">시흥시 목감동 날씨를 불러오고 있어요...</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 우측: 둥근 흰색 다중 패널 날씨 카드 -->
-            <div class="w-full lg:w-[54%] xl:w-[53%] bg-white ink-border rounded-[16px] px-3 py-2 shadow-sm flex flex-col justify-between gap-1.5">
-                <div class="flex items-stretch gap-2">
-<!-- ... existing code ... -->
+            <!-- 픽셀 잔디 띠 -->
+            <div class="pixel-grass w-full"></div>
+        </header>
+
+        <!-- 2. 중간: 출발 카운트다운 + 마스코트 진행 바 -->
+        <section class="shrink-0 px-3 sm:px-5 pt-2.5 pb-2">
+            <div class="bg-white ink-border rounded-[18px] px-4 py-2.5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+                <!-- 왼쪽 카운트다운 (클릭 시 설정 모달 열기) -->
+                <button id="btn-open-settings" type="button" title="아이 이름·출발 시각·시트 설정 변경"
+                    class="text-left shrink-0 hover:opacity-80 transition flex flex-col leading-tight">
+                    <span id="countdown-title" class="text-xs sm:text-sm font-black text-slate-500 flex items-center gap-1">
+                        <span>유치원 출발까지</span>
+                        <span class="text-[11px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">⚙️ 설정</span>
+                    </span>
+                    <div id="countdown-value" class="font-display text-2xl sm:text-[1.85rem] text-[#16a34a] tracking-tight">
+                        40분 남았어요
+                    </div>
+                </button>
+
+                <!-- 중앙: 진행 바 + 노란 마스코트 + 말풍선 -->
+                <div class="flex-1 w-full flex flex-col justify-center">
+                    <div class="relative w-full h-9 sm:h-10 bg-[#f5f3e7] ink-border-thin rounded-full flex items-center px-1 overflow-visible">
+                        <!-- 초록색 채움 바 -->
+                        <div id="progress-fill" class="h-full rounded-full bg-gradient-to-r from-[#22c55e] to-[#4ade80] transition-all duration-500" style="width: 25%;"></div>
+
+                        <!-- 진행 위치 따라 움직이는 귀여운 노란 마스코트 -->
+                        <div id="progress-mascot" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-500 z-20 pointer-events-none" style="left: 25%;">
+                            <svg class="w-11 h-11 sm:w-12 sm:h-12 mascot-hop drop-shadow-sm" viewBox="0 0 64 64" fill="none">
+                                <!-- 꼬리 -->
+                                <path d="M12 40 L4 32 L11 30 L7 22 L18 28 Z" fill="#facc15" stroke="#253342" stroke-width="2.5" stroke-linejoin="round"/>
+                                <!-- 귀 -->
+                                <path d="M22 20 L16 6 L28 15 Z" fill="#facc15" stroke="#253342" stroke-width="2.5" stroke-linejoin="round"/>
+                                <path d="M16 6 L19 11 L23 10 Z" fill="#253342"/>
+                                <path d="M40 19 L48 6 L45 20 Z" fill="#facc15" stroke="#253342" stroke-width="2.5" stroke-linejoin="round"/>
+                                <path d="M48 6 L44 10 L46 12 Z" fill="#253342"/>
+                                <!-- 몸통 & 얼굴 -->
+                                <ellipse cx="33" cy="39" rx="14" ry="15" fill="#fde047" stroke="#253342" stroke-width="2.5"/>
+                                <circle cx="33" cy="27" r="12" fill="#fde047" stroke="#253342" stroke-width="2.5"/>
+                                <!-- 눈 & 빨간 볼 -->
+                                <circle cx="29" cy="26" r="2.2" fill="#253342"/>
+                                <circle cx="38" cy="26" r="2.2" fill="#253342"/>
+                                <circle cx="28.3" cy="25.3" r="0.8" fill="#ffffff"/>
+                                <circle cx="37.3" cy="25.3" r="0.8" fill="#ffffff"/>
+                                <circle cx="24.5" cy="30" r="2.8" fill="#ef4444"/>
+                                <circle cx="41.5" cy="30" r="2.8" fill="#ef4444"/>
+                                <!-- 웃는 입 -->
+                                <path d="M30.5 30 Q33.5 33 36.5 30" stroke="#253342" stroke-width="2" stroke-linecap="round"/>
+                                <!-- 발 -->
+                                <ellipse cx="27" cy="53" rx="4.5" ry="2.5" fill="#facc15" stroke="#253342" stroke-width="2"/>
+                                <ellipse cx="39" cy="53" rx="4.5" ry="2.5" fill="#facc15" stroke="#253342" stroke-width="2"/>
+                            </svg>
+                        </div>
+
+                        <!-- 가운데 안내 말풍선 -->
+                        <div class="absolute left-1/2 -translate-x-1/2 z-10 bg-white ink-border-thin rounded-full px-3.5 py-0.5 text-xs sm:text-sm font-black text-[#253342] shadow-sm whitespace-nowrap">
+                            <span id="progress-speech">우리 아이, 같이 준비하자!</span>
+                            <span id="progress-stars" class="ml-1.5 text-amber-500">⭐ 0/4</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] sm:text-xs font-bold text-slate-500 mt-1 px-1">
+                        <span id="active-sheet-caption">🏫 유치원 시트 연동 중</span>
+                        <span id="departure-label">출발 오전 8:50</span>
+                    </div>
+                </div>
+
+                <!-- 오른쪽: 유치원 건물 아이콘 -->
+                <div class="hidden sm:flex shrink-0 items-center justify-center pl-1">
+                    <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none" aria-label="유치원">
+                        <rect x="8" y="28" width="48" height="28" rx="3" fill="#fef3c7" stroke="#253342" stroke-width="2.5"/>
+                        <polygon points="4,29 32,10 60,29" fill="#f97316" stroke="#253342" stroke-width="2.5" stroke-linejoin="round"/>
+                        <circle cx="32" cy="21" r="4.5" fill="#ffffff" stroke="#253342" stroke-width="2"/>
+                        <path d="M32 19 V21.5 L34 22.5" stroke="#253342" stroke-width="1.5" stroke-linecap="round"/>
+                        <rect x="26" y="40" width="12" height="16" rx="2" fill="#93c5fd" stroke="#253342" stroke-width="2"/>
+                        <rect x="13" y="34" width="8" height="8" rx="1.5" fill="#bae6fd" stroke="#253342" stroke-width="2"/>
+                        <rect x="43" y="34" width="8" height="8" rx="1.5" fill="#bae6fd" stroke="#253342" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 하단: 할 일 카드 그리드 (4열 기준, 항목 많으면 깔끔하게 스크롤) -->
+        <main class="flex-1 min-h-0 px-3 sm:px-5 pb-3 pt-0.5 overflow-y-auto no-scrollbar">
+            <div id="task-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 h-full auto-rows-fr">
+                <!-- JS 렌더링 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== 칭찬 토스트 ==================== -->
+    <div id="praise-toast" class="hidden fixed bottom-6 left-1/2 z-50 bg-[#253342] text-white font-display text-lg sm:text-xl px-6 py-3 rounded-full shadow-xl border-2 border-[#facc15]">
+        최고야! 하나 완료했어! ⭐
+    </div>
+
+    <!-- ==================== 야간 암전 오버레이 (기본 OFF, 수동 미리보기 또는 설정 시 작동) ==================== -->
+    <div id="night-overlay" class="hidden fixed inset-0 z-50 bg-black flex flex-col items-center justify-center cursor-pointer text-center px-6">
+        <div id="night-clock" class="font-pixel text-5xl sm:text-7xl text-neutral-800 tracking-widest mb-4">22:00</div>
+        <p class="text-neutral-700 text-sm sm:text-base font-bold">화면을 터치하면 대시보드로 돌아가요</p>
+    </div>
+
+    <!-- ==================== 설정 모달 (alert/confirm 미사용) ==================== -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white ink-border rounded-3xl w-full max-w-md p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h2 class="font-display text-2xl text-[#253342]">⚙️ 우리집 대시보드 설정</h2>
+                <button id="btn-close-settings" type="button" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 font-black text-lg">✕</button>
+            </div>
+
+            <div class="flex flex-col gap-3 text-sm font-bold">
+                <label class="flex flex-col gap-1">
+                    <span class="text-slate-600">아이 이름 (말풍선에 표시)</span>
+                    <input id="input-child-name" type="text" placeholder="예: 민준이"
+                        class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 focus:border-[#3b82f6] outline-none text-base font-bold">
+                </label>
+
+                <label class="flex flex-col gap-1">
+                    <span class="text-slate-600">유치원 출발 시각</span>
+                    <input id="input-depart-time" type="time"
+                        class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 focus:border-[#3b82f6] outline-none text-base font-bold">
+                </label>
+
+                <label class="flex flex-col gap-1">
+                    <span class="text-slate-600">'유치원' 시트 GID 또는 CSV 주소 (선택)</span>
+                    <input id="input-kinder-source" type="text" placeholder="비워두면 '유치원' 탭을 자동으로 찾아요"
+                        class="w-full px-3.5 py-2 rounded-xl border-2 border-slate-300 focus:border-[#3b82f6] outline-none text-xs font-medium">
+                    <span class="text-[11px] text-slate-400 font-medium">자동 탐색이 안 될 때만 유치원 시트의 gid 숫자나 CSV 주소를 넣어주세요.</span>
+                </label>
+
+                <div class="flex items-center justify-between bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+                    <div>
+                        <div class="text-slate-800">밤 10시~아침 7시 자동 화면 끄기</div>
+                        <div class="text-[11px] text-slate-500 font-medium">기본은 꺼짐(24시간 항상 켜짐 유지)</div>
+                    </div>
+                    <input id="input-auto-night" type="checkbox" class="w-6 h-6 accent-[#22c55e] cursor-pointer">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-2">
+                <button id="btn-reset-checks" type="button"
+                    class="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-black text-sm border border-rose-200">
+                    체크 모두 풀기
+                </button>
+                <div class="flex items-center gap-2">
+                    <button id="btn-cancel-settings" type="button"
+                        class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm">
+                        취소
+                    </button>
+                    <button id="btn-save-settings" type="button"
+                        class="px-5 py-2.5 rounded-xl bg-[#22c55e] hover:bg-[#16a34a] text-white font-black text-sm ink-border-thin">
+                        저장하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================================
+           1. 상수 및 기본 설정
+        ===================================================================== */
+        const BASE_SHEET_PUB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRh3u5mxfBwnGCDlZZh1zCfZI3kjSP0Mlb3d64umKM7HrfNyhQRxNEpsVmbm7JcRwn_RdI16lIEPjmF';
+        const FAMILY_SHEET_CSV_URL = `${BASE_SHEET_PUB_URL}/pub?output=csv`;
+        const PUB_HTML_URL = `${BASE_SHEET_PUB_URL}/pubhtml`;
+        const KINDERGARTEN_SHEET_NAME = '유치원';
+
+        // 경기도 시흥시 목감동 좌표
+        const MOKGAM_LAT = 37.3822;
+        const MOKGAM_LON = 126.8602;
+
+        const STORAGE_KEYS = {
+            SETTINGS: 'family_dash_settings_v5',
+            MODE: 'family_dash_mode_v5', // 'kindergarten' | 'family'
+            CHECKS: 'family_dash_checks_v5',
+            CACHE_PREFIX: 'family_dash_sheet_cache_v5_',
+            DISCOVERED_GID: 'family_dash_kinder_gid_v5'
+        };
+
+        // 오프라인/최초 접속 시 기본 표시 목록
+        const FALLBACK_TASKS = {
+            kindergarten: [
+                { task: '아침 먹기', who: '아이' },
+                { task: '세수·양치', who: '아이' },
+                { task: '옷 입기', who: '아이' },
+                { task: '가방 챙기기', who: '아이' }
+            ],
+            family: [
+                { task: '아침 먹기', who: '아이' },
+                { task: '세수·양치', who: '아이' },
+                { task: '옷 입기', who: '아이' },
+                { task: '가방 챙기기', who: '아이' }
+            ]
+        };
+
+        const PRAISE_MESSAGES = [
+            '우와! 정말 잘했어! ⭐',
+            '최고야! 멋지게 해냈네! 🎉',
+            '짝짝짝! 스스로 척척! 👏',
+            '대단해! 다음 것도 같이 해보자! 💪',
+            '우리 집 최고 멋쟁이! 🌟'
+        ];
+
+        /* =====================================================================
+           2. 앱 상태
+        ===================================================================== */
+        let settings = loadSettings();
+        let activeMode = localStorage.getItem(STORAGE_KEYS.MODE) || 'kindergarten'; // 상단 '유치원' 탭 기본 활성화
+        let selectedAssignee = '전체';
+        let tasksByMode = {
+            kindergarten: loadCachedTasks('kindergarten'),
+            family: loadCachedTasks('family')
+        };
+        let syncStatusByMode = {
+            kindergarten: { synced: false, timeText: '' },
+            family: { synced: false, timeText: '' }
+        };
+        let checkState = loadCheckState();
+        let manualNightPreview = false;
+        let tempWakeUntil = 0;
+        let wakeLockSentinel = null;
+
+        /* =====================================================================
+           3. PWA 매니페스트 동적 주입 (단일 HTML 홈 화면 전체 화면 지원)
+        ===================================================================== */
+        function setupPwaManifest() {
+            try {
+                const manifest = {
+                    name: '우리집 가족 대시보드',
+                    short_name: '가족 대시보드',
+                    start_url: '.',
+                    display: 'standalone',
+                    orientation: 'landscape',
+                    background_color: '#ebf7df',
+                    theme_color: '#5eb8f5'
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('pwa-manifest').setAttribute('href', url);
+            } catch (e) {
+                // 무시
+            }
+        }
+
+        /* =====================================================================
+           4. 설정 & 로컬 저장소 유틸 (아침 7시 자동 초기화 포함)
+        ===================================================================== */
+        function loadSettings() {
+            const defaults = {
+                childName: '우리 아이',
+                departTime: '08:50',
+                autoNightBlackout: false, // 요청: 자동꺼짐 OFF가 기본
+                kinderSource: ''          // 선택: 직접 GID나 CSV 주소 입력 시 사용
+            };
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || '{}');
+                return { ...defaults, ...saved };
+            } catch {
+                return defaults;
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        }
+
+        // 아침 7시 기준 하루 키 생성 (오전 7시 이전이면 전날 날짜 키)
+        function getMorningDayKey(date = new Date()) {
+            const d = new Date(date.getTime());
+            if (d.getHours() < 7) {
+                d.setDate(d.getDate() - 1);
+            }
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function loadCheckState() {
+            const todayKey = getMorningDayKey();
+            try {
+                const parsed = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHECKS) || '{}');
+                if (parsed.dayKey === todayKey && parsed.checkedMap) {
+                    return parsed;
+                }
+            } catch {
+                // 초기화
+            }
+            const fresh = { dayKey: todayKey, checkedMap: {} };
+            localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(fresh));
+            return fresh;
+        }
+
+        function ensureMorningReset() {
+            const todayKey = getMorningDayKey();
+            if (checkState.dayKey !== todayKey) {
+                checkState = { dayKey: todayKey, checkedMap: {} };
+                localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(checkState));
+                renderTasks();
+            }
+        }
+
+        function getTaskKey(mode, item) {
+            return `${mode}::${item.task}::${item.who || ''}`;
+        }
+
+        function loadCachedTasks(mode) {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.CACHE_PREFIX + mode);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch {
+                // 무시
+            }
+            return FALLBACK_TASKS[mode];
+        }
+
+        function saveCachedTasks(mode, items) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.CACHE_PREFIX + mode, JSON.stringify(items));
+            } catch {
+                // 무시
+            }
+        }
+
+        /* =====================================================================
+           5. 구글 시트 CSV 파싱 & '유치원' 탭 자동 탐색 연동 (5분 주기)
+        ===================================================================== */
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                const next = text[i + 1];
+
+                if (inQuotes) {
+                    if (ch === '"' && next === '"') {
+                        cell += '"';
+                        i++;
+                    } else if (ch === '"') {
+                        inQuotes = false;
+                    } else {
+                        cell += ch;
+                    }
+                } else {
+                    if (ch === '"') {
+                        inQuotes = true;
+                    } else if (ch === ',') {
+                        row.push(cell.trim());
+                        cell = '';
+                    } else if (ch === '\r' && next === '\n') {
+                        row.push(cell.trim());
+                        rows.push(row);
+                        row = [];
+                        cell = '';
+                        i++;
+                    } else if (ch === '\n' || ch === '\r') {
+                        row.push(cell.trim());
+                        rows.push(row);
+                        row = [];
+                        cell = '';
+                    } else {
+                        cell += ch;
+                    }
+                }
+            }
+            if (cell.length > 0 || row.length > 0) {
+                row.push(cell.trim());
+                rows.push(row);
+            }
+
+            // 빈 행 제거 및 첫 번째 행 헤더 자동 판별
+            const cleaned = rows
+                .map(r => ({
+                    task: (r[0] || '').replace(/^\uFEFF/, '').trim(),
+                    who: (r[1] || '').trim()
+                }))
+                .filter(item => item.task.length > 0);
+
+            if (cleaned.length > 0) {
+                const firstTask = cleaned[0].task.toLowerCase();
+                const firstWho = cleaned[0].who.toLowerCase();
+                const isHeader =
+                    ['할 일', '할일', 'todo', 'task', '루틴', '항목', '제목'].some(h => firstTask.includes(h)) ||
+                    ['누구', '담당', '담당자', '이름', 'who', 'assignee'].some(h => firstWho.includes(h));
+                if (isHeader) {
+                    cleaned.shift();
+                }
+            }
+
+            return cleaned;
+        }
+
+        // pubhtml에서 '유치원' 탭의 gid를 자동 탐색
+        async function discoverKindergartenGid() {
+            const cachedGid = localStorage.getItem(STORAGE_KEYS.DISCOVERED_GID);
+            try {
+                const res = await fetch(`${PUB_HTML_URL}?_t=${Date.now()}`, { cache: 'no-store' });
+                if (!res.ok) return cachedGid;
+                const html = await res.text();
+
+                // 패턴 1: items.push({name: "유치원", pageUrl: "...", gid: "123456", ...})
+                const itemRegex = /items\.push\(\{[^}]*name:\s*"([^"]+)"[^}]*gid:\s*"(\d+)"/g;
+                let match;
+                while ((match = itemRegex.exec(html)) !== null) {
+                    if (match[1].trim() === KINDERGARTEN_SHEET_NAME) {
+                        localStorage.setItem(STORAGE_KEYS.DISCOVERED_GID, match[2]);
+                        return match[2];
+                    }
+                }
+
+                // 패턴 2: <li id="sheet-button-123456"><a ...>유치원</a></li>
+                const tabRegex = /id="sheet-button-(\d+)"[^>]*>[\s\S]*?<a[^>]*>([^<]+)<\/a>/g;
+                while ((match = tabRegex.exec(html)) !== null) {
+                    if (match[2].trim() === KINDERGARTEN_SHEET_NAME) {
+                        localStorage.setItem(STORAGE_KEYS.DISCOVERED_GID, match[1]);
+                        return match[1];
+                    }
+                }
+            } catch {
+                // CORS 또는 오프라인 시 기존 저장된 gid 사용
+            }
+            return cachedGid;
+        }
+
+        // 모드에 맞는 CSV 후보 URL 목록 생성
+        async function buildSheetCandidateUrls(mode) {
+            const bust = `_t=${Date.now()}`;
+            if (mode === 'family') {
+                return [`${FAMILY_SHEET_CSV_URL}&${bust}`];
+            }
+
+            // '유치원' 모드
+            const urls = [];
+            const custom = (settings.kinderSource || '').trim();
+            if (custom) {
+                if (custom.startsWith('http')) {
+                    urls.push(custom.includes('?') ? `${custom}&${bust}` : `${custom}?${bust}`);
+                } else if (/^\d+$/.test(custom)) {
+                    urls.push(`${BASE_SHEET_PUB_URL}/pub?gid=${custom}&single=true&output=csv&${bust}`);
+                }
+            }
+
+            const discoveredGid = await discoverKindergartenGid();
+            if (discoveredGid) {
+                urls.push(`${BASE_SHEET_PUB_URL}/pub?gid=${discoveredGid}&single=true&output=csv&${bust}`);
+            }
+
+            // 시트 이름 직접 지정 시도 + 마지막 폴백으로 기본 CSV
+            urls.push(`${BASE_SHEET_PUB_URL}/pub?output=csv&sheet=${encodeURIComponent(KINDERGARTEN_SHEET_NAME)}&${bust}`);
+            urls.push(`${FAMILY_SHEET_CSV_URL}&${bust}`);
+            return urls;
+        }
+
+        async function fetchSheetForMode(mode) {
+            const labelEl = document.getElementById('sync-label');
+            const iconEl = document.getElementById('sync-icon');
+            if (mode === activeMode && labelEl) {
+                labelEl.textContent = '동기화 중...';
+                iconEl.textContent = '🔄';
+            }
+
+            try {
+                const candidateUrls = await buildSheetCandidateUrls(mode);
+                let parsedItems = null;
+
+                for (const url of candidateUrls) {
+                    try {
+                        const res = await fetch(url, { cache: 'no-store' });
+                        if (!res.ok) continue;
+                        const text = await res.text();
+                        // HTML 에러 페이지가 아닌 실제 CSV인지 확인
+                        if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) continue;
+                        const items = parseCsv(text);
+                        if (items.length > 0) {
+                            parsedItems = items;
+                            break;
+                        }
+                    } catch {
+                        // 다음 후보 URL 시도
+                    }
+                }
+
+                if (parsedItems && parsedItems.length > 0) {
+                    tasksByMode[mode] = parsedItems;
+                    saveCachedTasks(mode, parsedItems);
+                    const now = new Date();
+                    const hh = String(now.getHours()).padStart(2, '0');
+                    const mm = String(now.getMinutes()).padStart(2, '0');
+                    syncStatusByMode[mode] = { synced: true, timeText: `${hh}:${mm}` };
+                } else {
+                    syncStatusByMode[mode] = { synced: false, timeText: '' };
+                }
+            } catch {
+                syncStatusByMode[mode] = { synced: false, timeText: '' };
+            }
+
+            if (mode === activeMode) {
+                updateSyncBadge();
+                renderAssigneeFilters();
+                renderTasks();
+            }
+        }
+
+        function updateSyncBadge() {
+            const labelEl = document.getElementById('sync-label');
+            const iconEl = document.getElementById('sync-icon');
+            const status = syncStatusByMode[activeMode];
+            if (!labelEl || !iconEl) return;
+
+            if (status && status.synced) {
+                iconEl.textContent = '📋';
+                labelEl.textContent = `시트 ${status.timeText}`;
+            } else {
+                iconEl.textContent = '💾';
+                labelEl.textContent = '저장된 목록';
+            }
+        }
+
+        function switchMode(mode) {
+            activeMode = mode;
+            selectedAssignee = '전체';
+            localStorage.setItem(STORAGE_KEYS.MODE, mode);
+            updateModeTabsUI();
+            updateSyncBadge();
+            renderAssigneeFilters();
+            renderTasks();
+            fetchSheetForMode(mode);
+        }
+
+        function updateModeTabsUI() {
+            const btnKinder = document.getElementById('tab-kindergarten');
+            const btnFamily = document.getElementById('tab-family');
+            const caption = document.getElementById('active-sheet-caption');
+
+            if (activeMode === 'kindergarten') {
+                btnKinder.className = 'nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-[#fef08a] text-[#253342] ring-2 ring-[#f59e0b]/40';
+                btnFamily.className = 'nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-white/80 text-[#253342] hover:bg-white';
+                if (caption) caption.textContent = '🏫 family-dashboard · 유치원 시트';
+            } else {
+                btnKinder.className = 'nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-white/80 text-[#253342] hover:bg-white';
+                btnFamily.className = 'nav-pill px-3.5 py-1.5 text-sm sm:text-[15px] flex items-center gap-1.5 bg-[#bfdbfe] text-[#1e3a8a] ring-2 ring-[#3b82f6]/40';
+                if (caption) caption.textContent = '🏠 family-dashboard · 기본 할 일 시트';
+            }
+        }
+
+        /* =====================================================================
+           6. 담당자('누구') 컬러 배지 & 필터 탭 렌더링
+        ===================================================================== */
+        function getAssigneeStyle(who) {
+            if (!who) return { bg: '#e2e8f0', text: '#334155', emoji: '⭐' };
+            if (who.includes('엄마')) return { bg: '#fce7f3', text: '#be185d', emoji: '👩' };
+            if (who.includes('아빠')) return { bg: '#dbeafe', text: '#1d4ed8', emoji: '👨' };
+            if (who.includes('가족') || who.includes('모두')) return { bg: '#fef3c7', text: '#b45309', emoji: '👨‍👩‍👦' };
+            return { bg: '#dcfce7', text: '#15803d', emoji: '👦' };
+        }
+
+        function renderAssigneeFilters() {
+            const container = document.getElementById('assignee-filters');
+            if (!container) return;
+            const items = tasksByMode[activeMode] || [];
+            const uniqueWho = Array.from(new Set(items.map(i => i.who).filter(Boolean)));
+
+            if (uniqueWho.length <= 1) {
+                container.innerHTML = '';
+                selectedAssignee = '전체';
+                return;
+            }
+
+            const tabs = ['전체', ...uniqueWho];
+            if (!tabs.includes(selectedAssignee)) selectedAssignee = '전체';
+
+            container.innerHTML = tabs.map(name => {
+                const isActive = selectedAssignee === name;
+                const style = name === '전체' ? { emoji: '✨' } : getAssigneeStyle(name);
+                return `
+                    <button type="button" data-who="${escapeHtml(name)}"
+                        class="nav-pill px-3 py-1.5 text-xs sm:text-sm flex items-center gap-1 ${
+                            isActive
+                                ? 'bg-[#253342] text-white'
+                                : 'bg-white/80 hover:bg-white text-[#253342]'
+                        }">
+                        <span>${style.emoji}</span>
+                        <span>${escapeHtml(name)}</span>
+                    </button>
+                `;
+            }).join('');
+
+            container.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedAssignee = btn.dataset.who;
+                    renderAssigneeFilters();
+                    renderTasks();
+                });
+            });
+        }
+
+        /* =====================================================================
+           7. 짧은 머리 남자아이 동화풍 인라인 SVG 일러스트 (10종)
+        ===================================================================== */
+        function getBoyHeadSvg(cx = 100, cy = 62, expression = 'happy') {
+            // 귀가 또렷하게 보이고 목 아래로 내려오는 단발이 전혀 없는 짧은 앞머리 남자아이 얼굴
+            let mouth = `<path d="M${cx - 6} ${cy + 11} Q${cx} ${cy + 17} ${cx + 6} ${cy + 11}" stroke="#253342" stroke-width="2.6" stroke-linecap="round" fill="none"/>`;
+            if (expression === 'open') {
+                mouth = `<path d="M${cx - 7} ${cy + 10} Q${cx} ${cy + 20} ${cx + 7} ${cy + 10} Z" fill="#ef4444" stroke="#253342" stroke-width="2.2"/>`;
+            } else if (expression === 'brush') {
+                mouth = `<rect x="${cx - 8}" y="${cy + 10}" width="16" height="7" rx="3.5" fill="#ffffff" stroke="#253342" stroke-width="2"/>`;
+            } else if (expression === 'sleep') {
+                mouth = `<circle cx="${cx}" cy="${cy + 13}" r="3.2" fill="#f87171" stroke="#253342" stroke-width="2"/>`;
+            }
+
+            const eyes = expression === 'sleep'
+                ? `<path d="M${cx - 14} ${cy + 2} Q${cx - 10} ${cy + 6} ${cx - 6} ${cy + 2}" stroke="#253342" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+                   <path d="M${cx + 6} ${cy + 2} Q${cx + 10} ${cy + 6} ${cx + 14} ${cy + 2}" stroke="#253342" stroke-width="2.6" stroke-linecap="round" fill="none"/>`
+                : `<circle cx="${cx - 10}" cy="${cy + 2}" r="3.1" fill="#253342"/>
+                   <circle cx="${cx + 10}" cy="${cy + 2}" r="3.1" fill="#253342"/>
+                   <circle cx="${cx - 11}" cy="${cy + 1}" r="1" fill="#ffffff"/>
+                   <circle cx="${cx + 9}" cy="${cy + 1}" r="1" fill="#ffffff"/>`;
+
+            return `
+                <!-- 양쪽 귀 (짧은 머리라 귀가 선명하게 보임) -->
+                <circle cx="${cx - 25}" cy="${cy + 4}" r="6.2" fill="#fed7aa" stroke="#253342" stroke-width="2.6"/>
+                <circle cx="${cx + 25}" cy="${cy + 4}" r="6.2" fill="#fed7aa" stroke="#253342" stroke-width="2.6"/>
+
+                <!-- 얼굴 윤곽 -->
+                <circle cx="${cx}" cy="${cy + 2}" r="24.5" fill="#ffedd5" stroke="#253342" stroke-width="2.8"/>
+
+                <!-- 짧은 스포츠/투블록 남자아이 머리카락 (목선 아래로 절대 내려오지 않음) -->
+                <path d="M${cx - 24} ${cy - 3}
+                         C${cx - 26} ${cy - 22}, ${cx - 14} ${cy - 30}, ${cx} ${cy - 29}
+                         C${cx + 14} ${cy - 30}, ${cx + 26} ${cy - 22}, ${cx + 24} ${cy - 3}
+                         L${cx + 20} ${cy - 8}
+                         L${cx + 14} ${cy - 13}
+                         L${cx + 8} ${cy - 6}
+                         L${cx + 2} ${cy - 14}
+                         L${cx - 5} ${cy - 6}
+                         L${cx - 12} ${cy - 13}
+                         L${cx - 19} ${cy - 8} Z"
+                      fill="#3b2f2f" stroke="#253342" stroke-width="2.6" stroke-linejoin="round"/>
+                <!-- 윗머리 삐죽 포인트 -->
+                <path d="M${cx - 6} ${cy - 28} L${cx - 1} ${cy - 36} L${cx + 4} ${cy - 28}" fill="#3b2f2f" stroke="#253342" stroke-width="2.4" stroke-linejoin="round"/>
+
+                <!-- 둥근 눈썹 -->
+                <path d="M${cx - 14} ${cy - 5} Q${cx - 10} ${cy - 7.5} ${cx - 6} ${cy - 5}" stroke="#253342" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                <path d="M${cx + 6} ${cy - 5} Q${cx + 10} ${cy - 7.5} ${cx + 14} ${cy - 5}" stroke="#253342" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+                <!-- 눈, 발그레 볼, 입 -->
+                ${eyes}
+                <ellipse cx="${cx - 15}" cy="${cy + 9}" rx="4.2" ry="2.4" fill="#fca5a5" opacity="0.8"/>
+                <ellipse cx="${cx + 15}" cy="${cy + 9}" rx="4.2" ry="2.4" fill="#fca5a5" opacity="0.8"/>
+                ${mouth}
+            `;
+        }
+
+        function getTaskIllustrationSvg(taskText) {
+            const t = (taskText || '').toLowerCase();
+
+            // 1. 아침 먹기 / 밥 / 간식
+            if (/(아침|밥|식사|먹기|간식|저녁|점심|우유)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <!-- 의자 & 몸통 -->
+                        <rect x="74" y="88" width="52" height="36" rx="14" fill="#60a5fa" stroke="#253342" stroke-width="2.8"/>
+                        ${getBoyHeadSvg(100, 56, 'open')}
+                        <!-- 숟가락 든 팔 -->
+                        <path d="M76 98 L62 84" stroke="#fed7aa" stroke-width="11" stroke-linecap="round"/>
+                        <path d="M76 98 L62 84" stroke="#253342" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+                        <line x1="58" y1="82" x2="78" y2="75" stroke="#94a3b8" stroke-width="3.2" stroke-linecap="round"/>
+                        <ellipse cx="81" cy="74" rx="5.5" ry="3.5" fill="#e2e8f0" stroke="#253342" stroke-width="2"/>
+                        <!-- 식탁 -->
+                        <rect x="28" y="114" width="144" height="14" rx="5" fill="#d99b66" stroke="#253342" stroke-width="2.8"/>
+                        <rect x="40" y="128" width="10" height="34" rx="3" fill="#c28450" stroke="#253342" stroke-width="2.6"/>
+                        <rect x="150" y="128" width="10" height="34" rx="3" fill="#c28450" stroke="#253342" stroke-width="2.6"/>
+                        <!-- 밥그릇 & 국그릇 -->
+                        <path d="M54 114 C54 102, 82 102, 82 114 Z" fill="#ffffff" stroke="#253342" stroke-width="2.4"/>
+                        <path d="M58 106 Q68 96 78 106" fill="#fef9c3" stroke="#253342" stroke-width="2"/>
+                        <path d="M90 114 C90 103, 122 103, 122 114 Z" fill="#fef08a" stroke="#253342" stroke-width="2.4"/>
+                        <rect x="130" y="100" width="16" height="14" rx="3" fill="#bae6fd" stroke="#253342" stroke-width="2.2"/>
+                    </svg>
+                `;
+            }
+
+            // 2. 세수 / 양치 / 씻기 / 샤워
+            if (/(세수|양치|치카|이\s?닦|씻기|목욕|샤워|손\s?씻)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <!-- 반짝이 거품 -->
+                        <circle cx="52" cy="54" r="5" fill="#bae6fd" stroke="#253342" stroke-width="2"/>
+                        <circle cx="148" cy="48" r="6" fill="#bae6fd" stroke="#253342" stroke-width="2"/>
+                        <circle cx="154" cy="68" r="3.5" fill="#e0f2fe" stroke="#253342" stroke-width="1.8"/>
+                        <!-- 상의 -->
+                        <rect x="74" y="88" width="52" height="36" rx="14" fill="#34d399" stroke="#253342" stroke-width="2.8"/>
+                        ${getBoyHeadSvg(100, 56, 'brush')}
+                        <!-- 칫솔 -->
+                        <line x1="70" y1="73" x2="106" y2="70" stroke="#ef4444" stroke-width="4.5" stroke-linecap="round"/>
+                        <rect x="97" y="65" width="12" height="6" rx="2" fill="#ffffff" stroke="#253342" stroke-width="1.8"/>
+                        <!-- 양치컵 -->
+                        <rect x="122" y="96" width="18" height="22" rx="4" fill="#60a5fa" stroke="#253342" stroke-width="2.4"/>
+                        <!-- 세면대 -->
+                        <path d="M44 122 H156 C152 146, 132 154, 100 154 C68 154, 48 146, 44 122 Z" fill="#dbeafe" stroke="#253342" stroke-width="2.8"/>
+                        <ellipse cx="100" cy="122" rx="56" ry="8" fill="#eff6ff" stroke="#253342" stroke-width="2.6"/>
+                        <!-- 치약 -->
+                        <rect x="132" y="144" width="26" height="10" rx="3" fill="#ffffff" stroke="#253342" stroke-width="2.2"/>
+                        <rect x="158" y="146" width="6" height="6" rx="1" fill="#3b82f6" stroke="#253342" stroke-width="2"/>
+                    </svg>
+                `;
+            }
+
+            // 3. 옷 입기 / 갈아입기 / 양말
+            if (/(옷|입기|갈아입|양말|신발|겉옷|잠옷)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <!-- 바지 & 다리 -->
+                        <rect x="82" y="122" width="14" height="30" rx="6" fill="#fed7aa" stroke="#253342" stroke-width="2.4"/>
+                        <rect x="104" y="122" width="14" height="30" rx="6" fill="#fed7aa" stroke="#253342" stroke-width="2.4"/>
+                        <rect x="78" y="108" width="44" height="22" rx="6" fill="#1e3a8a" stroke="#253342" stroke-width="2.6"/>
+                        <!-- 노란 티셔츠 입는 중 -->
+                        <path d="M74 88 H126 L136 108 L122 114 L120 112 H80 L78 114 L64 108 Z" fill="#facc15" stroke="#253342" stroke-width="2.8" stroke-linejoin="round"/>
+                        <circle cx="100" cy="100" r="5" fill="#fb923c" stroke="#253342" stroke-width="1.8"/>
+                        ${getBoyHeadSvg(100, 56, 'happy')}
+                        <!-- 바닥에 놓인 옷 -->
+                        <path d="M30 144 L44 134 H62 L70 144 L62 156 H38 Z" fill="#93c5fd" stroke="#253342" stroke-width="2.4" stroke-linejoin="round"/>
+                        <path d="M134 140 H164 L170 156 H152 L149 148 L146 156 H128 Z" fill="#f87171" stroke="#253342" stroke-width="2.4" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            }
+
+            // 4. 가방 챙기기 / 등원 / 출발 / 준비물
+            if (/(가방|챙기|등원|유치원|출발|준비물|학교|알림장)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <!-- 반짝이 -->
+                        <path d="M52 72 L55 80 L63 83 L55 86 L52 94 L49 86 L41 83 L49 80 Z" fill="#fef08a" stroke="#253342" stroke-width="2"/>
+                        <path d="M150 54 L152 60 L158 62 L152 64 L150 70 L148 64 L142 62 L148 60 Z" fill="#fef08a" stroke="#253342" stroke-width="2"/>
+                        <!-- 노란 백팩 -->
+                        <rect x="114" y="84" width="26" height="36" rx="10" fill="#f59e0b" stroke="#253342" stroke-width="2.6"/>
+                        <rect x="120" y="98" width="16" height="14" rx="4" fill="#fde047" stroke="#253342" stroke-width="2"/>
+                        <!-- 다리 & 운동화 -->
+                        <rect x="82" y="124" width="13" height="24" rx="5" fill="#fed7aa" stroke="#253342" stroke-width="2.4"/>
+                        <rect x="105" y="124" width="13" height="24" rx="5" fill="#fed7aa" stroke="#253342" stroke-width="2.4"/>
+                        <ellipse cx="87" cy="152" rx="11" ry="6" fill="#3b82f6" stroke="#253342" stroke-width="2.4"/>
+                        <ellipse cx="113" cy="152" rx="11" ry="6" fill="#3b82f6" stroke="#253342" stroke-width="2.4"/>
+                        <!-- 반바지 & 반팔 -->
+                        <rect x="78" y="110" width="44" height="20" rx="5" fill="#1e40af" stroke="#253342" stroke-width="2.6"/>
+                        <rect x="76" y="84" width="48" height="30" rx="10" fill="#fde047" stroke="#253342" stroke-width="2.8"/>
+                        <!-- 가방 끈 -->
+                        <line x1="86" y1="84" x2="86" y2="112" stroke="#f59e0b" stroke-width="5"/>
+                        <line x1="114" y1="84" x2="114" y2="112" stroke="#f59e0b" stroke-width="5"/>
+                        <!-- 흔드는 팔 -->
+                        <path d="M124 94 L144 74" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+                        <path d="M124 94 L144 74" stroke="#253342" stroke-width="2.4" stroke-linecap="round"/>
+                        ${getBoyHeadSvg(100, 54, 'open')}
+                    </svg>
+                `;
+            }
+
+            // 5. 책 읽기 / 공부 / 숙제 / 한글 / 영어 / 피아노
+            if (/(책|독서|공부|숙제|한글|수학|영어|학습|글씨|그림|피아노)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <rect x="74" y="88" width="52" height="34" rx="14" fill="#a78bfa" stroke="#253342" stroke-width="2.8"/>
+                        ${getBoyHeadSvg(100, 56, 'happy')}
+                        <!-- 펼쳐진 책 -->
+                        <path d="M44 114 Q72 104 100 116 Q128 104 156 114 L152 152 Q126 142 100 154 Q74 142 48 152 Z" fill="#ffffff" stroke="#253342" stroke-width="2.8" stroke-linejoin="round"/>
+                        <line x1="100" y1="116" x2="100" y2="154" stroke="#253342" stroke-width="2.4"/>
+                        <line x1="60" y1="126" x2="88" y2="128" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="60" y1="136" x2="88" y2="138" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="112" y1="128" x2="140" y2="126" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                        <line x1="112" y1="138" x2="140" y2="136" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                `;
+            }
+
+            // 6. 정리 / 청소 / 장난감 / 이불 / 설거지
+            if (/(정리|청소|장난감|이불|치우|빨래|설거지|쓰레기)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <rect x="74" y="86" width="52" height="34" rx="14" fill="#fb923c" stroke="#253342" stroke-width="2.8"/>
+                        ${getBoyHeadSvg(100, 54, 'happy')}
+                        <!-- 장난감 정리함 -->
+                        <rect x="52" y="114" width="96" height="44" rx="10" fill="#60a5fa" stroke="#253342" stroke-width="2.8"/>
+                        <rect x="64" y="126" width="72" height="20" rx="5" fill="#eff6ff" stroke="#253342" stroke-width="2"/>
+                        <!-- 블록 & 공 -->
+                        <rect x="64" y="98" width="18" height="16" rx="3" fill="#facc15" stroke="#253342" stroke-width="2.2"/>
+                        <circle cx="128" cy="105" r="10" fill="#f87171" stroke="#253342" stroke-width="2.2"/>
+                    </svg>
+                `;
+            }
+
+            // 7. 약 / 비타민 / 물 마시기
+            if (/(약|비타민|물|영양제|홍삼)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <rect x="74" y="88" width="52" height="38" rx="14" fill="#38bdf8" stroke="#253342" stroke-width="2.8"/>
+                        ${getBoyHeadSvg(100, 56, 'happy')}
+                        <!-- 물컵 -->
+                        <path d="M84 114 H116 L112 154 H88 Z" fill="#bae6fd" stroke="#253342" stroke-width="2.8" stroke-linejoin="round"/>
+                        <path d="M86 128 H114 L112 154 H88 Z" fill="#38bdf8" opacity="0.65"/>
+                        <!-- 반짝 물방울 -->
+                        <path d="M138 112 C138 112 146 122 146 127 A8 8 0 1 1 130 127 C130 122 138 112 138 112 Z" fill="#60a5fa" stroke="#253342" stroke-width="2.2"/>
+                    </svg>
+                `;
+            }
+
+            // 8. 운동 / 산책 / 태권도 / 축구 / 놀이터
+            if (/(운동|산책|태권도|축구|놀이터|자전거|줄넘기|달리기)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <rect x="76" y="86" width="48" height="34" rx="12" fill="#4ade80" stroke="#253342" stroke-width="2.8"/>
+                        <rect x="78" y="114" width="44" height="18" rx="5" fill="#1e293b" stroke="#253342" stroke-width="2.4"/>
+                        ${getBoyHeadSvg(100, 54, 'open')}
+                        <!-- 축구공 -->
+                        <circle cx="144" cy="138" r="18" fill="#ffffff" stroke="#253342" stroke-width="2.8"/>
+                        <polygon points="144,128 151,134 148,143 140,143 137,134" fill="#253342"/>
+                    </svg>
+                `;
+            }
+
+            // 9. 잠자기 / 취침 / 잘 자요
+            if (/(잠|취침|자요|잘\s?자|눕기|코\s?자)/.test(t)) {
+                return `
+                    <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                        <!-- 초승달 & 별 -->
+                        <path d="M148 30 A14 14 0 1 0 162 48 A11 11 0 1 1 148 30 Z" fill="#fde047" stroke="#253342" stroke-width="2.2"/>
+                        <!-- 베개 -->
+                        <rect x="56" y="42" width="88" height="44" rx="16" fill="#fef9c3" stroke="#253342" stroke-width="2.6"/>
+                        ${getBoyHeadSvg(100, 62, 'sleep')}
+                        <!-- 이불 -->
+                        <path d="M36 96 H164 V152 C164 156 160 160 156 160 H44 C40 160 36 156 36 152 Z" fill="#93c5fd" stroke="#253342" stroke-width="2.8"/>
+                        <rect x="36" y="96" width="128" height="16" fill="#dbeafe" stroke="#253342" stroke-width="2.6"/>
+                    </svg>
+                `;
+            }
+
+            // 10. 기본 남자아이 응원 일러스트
+            return `
+                <svg class="w-full h-full max-h-[175px]" viewBox="0 0 200 175" fill="none">
+                    <!-- 반짝이 별 -->
+                    <path d="M46 60 L50 69 L59 72 L50 75 L46 84 L42 75 L33 72 L42 69 Z" fill="#fde047" stroke="#253342" stroke-width="2"/>
+                    <path d="M154 64 L157 71 L164 74 L157 77 L154 84 L151 77 L144 74 L151 71 Z" fill="#bae6fd" stroke="#253342" stroke-width="2"/>
+                    <!-- 티셔츠 & 반바지 -->
+                    <rect x="76" y="88" width="48" height="32" rx="12" fill="#60a5fa" stroke="#253342" stroke-width="2.8"/>
+                    <rect x="78" y="116" width="44" height="18" rx="5" fill="#334155" stroke="#253342" stroke-width="2.4"/>
+                    <rect x="84" y="134" width="12" height="18" rx="5" fill="#fed7aa" stroke="#253342" stroke-width="2.2"/>
+                    <rect x="104" y="134" width="12" height="18" rx="5" fill="#fed7aa" stroke="#253342" stroke-width="2.2"/>
+                    ${getBoyHeadSvg(100, 56, 'happy')}
+                </svg>
+            `;
+        }
+
+        // 다음 차례 카드에 등장하는 귀여운 초록 공룡 마스코트
+        const DINO_BADGE_SVG = `
+            <svg class="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-xs" viewBox="0 0 64 64" fill="none">
+                <ellipse cx="34" cy="36" rx="18" ry="14" fill="#4ade80" stroke="#253342" stroke-width="2.6"/>
+                <path d="M22 24 L32 12 L42 22 Z" fill="#16a34a" stroke="#253342" stroke-width="2.4" stroke-linejoin="round"/>
+                <circle cx="24" cy="36" r="2.6" fill="#253342"/>
+                <circle cx="38" cy="36" r="2.6" fill="#253342"/>
+                <path d="M27 42 Q31 45 35 42" stroke="#253342" stroke-width="2.2" stroke-linecap="round"/>
+                <rect x="20" y="47" width="8" height="8" rx="3" fill="#4ade80" stroke="#253342" stroke-width="2.2"/>
+                <rect x="38" y="47" width="8" height="8" rx="3" fill="#4ade80" stroke="#253342" stroke-width="2.2"/>
+            </svg>
+        `;
+
+        /* =====================================================================
+           8. 할 일 카드 렌더링 & 진행률 업데이트
+        ===================================================================== */
+        function renderTasks() {
+            const grid = document.getElementById('task-grid');
+            if (!grid) return;
+
+            const allItems = tasksByMode[activeMode] || [];
+            const filtered = selectedAssignee === '전체'
+                ? allItems
+                : allItems.filter(item => item.who === selectedAssignee);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center bg-white ink-border rounded-3xl p-8 text-center">
+                        <div class="text-5xl mb-3">📋</div>
+                        <div class="font-display text-2xl text-[#253342]">표시할 할 일이 없어요</div>
+                        <p class="text-sm font-bold text-slate-500 mt-1">구글 시트에 할 일을 추가하면 5분마다 자동으로 나타나요.</p>
+                    </div>
+                `;
+                updateProgressBar(0, 0);
+                return;
+            }
+
+            // 첫 번째 미완료 항목 인덱스 (노란 강조 테두리 + '같이 하자!' 배지)
+            const firstUncheckedIdx = filtered.findIndex(item => !checkState.checkedMap[getTaskKey(activeMode, item)]);
+            let doneCount = 0;
+
+            grid.innerHTML = filtered.map((item, idx) => {
+                const key = getTaskKey(activeMode, item);
+                const isDone = !!checkState.checkedMap[key];
+                if (isDone) doneCount++;
+                const isNext = idx === firstUncheckedIdx;
+                const whoStyle = getAssigneeStyle(item.who);
+
+                return `
+                    <article data-task-key="${escapeHtml(key)}"
+                        class="task-card flex flex-col justify-between p-3 sm:p-4 select-none ${isDone ? 'is-done' : ''} ${isNext ? 'is-next' : ''}">
+                        <!-- 상단: 번호 + 상태/담당자 배지 -->
+                        <div class="flex items-start justify-between gap-1 z-10">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ink-border-thin flex items-center justify-center font-display text-lg sm:text-xl ${
+                                    isDone ? 'bg-[#22c55e] text-white' : 'bg-white text-[#253342]'
+                                }">
+                                    ${isDone ? '✓' : idx + 1}
+                                </span>
+                                ${isNext ? `
+                                    <span class="px-2.5 py-0.5 rounded-full bg-[#fef08a] ink-border-thin text-xs font-black text-[#253342]">
+                                        같이 하자!
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <div class="flex items-center gap-1">
+                                ${item.who ? `
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black border border-black/15"
+                                          style="background:${whoStyle.bg}; color:${whoStyle.text};">
+                                        ${whoStyle.emoji} ${escapeHtml(item.who)}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- 다음 차례 카드 우상단 공룡 마스코트 -->
+                        ${isNext ? `<div class="absolute top-9 right-2 pointer-events-none z-10">${DINO_BADGE_SVG}</div>` : ''}
+
+                        <!-- 중앙: 남자아이 일러스트 -->
+                        <div class="flex-1 flex items-center justify-center my-1 min-h-0 relative ${isDone ? 'opacity-55' : ''}">
+                            ${getTaskIllustrationSvg(item.task)}
+                            ${isDone ? `
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div class="bg-[#22c55e]/95 text-white font-display text-2xl sm:text-3xl px-5 py-1.5 rounded-full ink-border shadow-md -rotate-6">
+                                        완료! ⭐
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- 하단: 큰 할 일 제목 -->
+                        <div class="text-center pt-1">
+                            <h3 class="font-display text-2xl sm:text-[1.75rem] xl:text-[2rem] leading-tight tracking-tight ${
+                                isDone ? 'line-through text-slate-400' : 'text-[#253342]'
+                            }">
+                                ${escapeHtml(item.task)}
+                            </h3>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            // 카드 클릭 이벤트 바인딩
+            grid.querySelectorAll('article[data-task-key]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const key = card.dataset.taskKey;
+                    const nowDone = !checkState.checkedMap[key];
+                    checkState.checkedMap[key] = nowDone;
+                    localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(checkState));
+
+                    if (nowDone) {
+                        playChime(true);
+                        showPraiseToast();
+                    } else {
+                        playChime(false);
+                    }
+                    renderTasks();
+                });
+            });
+
+            updateProgressBar(doneCount, filtered.length);
+        }
+
+        function updateProgressBar(done, total) {
+            const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+            const visualPct = Math.max(8, Math.min(94, pct));
+            const fill = document.getElementById('progress-fill');
+            const mascot = document.getElementById('progress-mascot');
+            const speech = document.getElementById('progress-speech');
+            const stars = document.getElementById('progress-stars');
+
+            if (fill) fill.style.width = `${pct}%`;
+            if (mascot) mascot.style.left = `${visualPct}%`;
+            if (stars) stars.textContent = `⭐ ${done}/${total}`;
+
+            if (speech) {
+                const name = settings.childName || '우리 아이';
+                if (total > 0 && done === total) {
+                    speech.textContent = `${name}, 오늘 할 일 모두 완료! 🎉`;
+                } else {
+                    speech.textContent = `${name}, 같이 준비하자!`;
+                }
+            }
+        }
+
+        /* =====================================================================
+           9. Web Audio API 칭찬 효과음 (외부 음원 URL 없음)
+        ===================================================================== */
+        let audioCtx = null;
+        function playChime(isComplete) {
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                if (!audioCtx) audioCtx = new AudioContextClass();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const notes = isComplete ? [523.25, 659.25, 783.99, 1046.5] : [392, 329.63];
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
+                    gain.gain.setValueAtTime(0.001, audioCtx.currentTime + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime + i * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.24);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + i * 0.08);
+                    osc.stop(audioCtx.currentTime + i * 0.08 + 0.26);
+                });
+            } catch {
+                // 오디오 차단 환경 무시
+            }
+        }
+
+        let toastTimer = null;
+        function showPraiseToast() {
+            const toast = document.getElementById('praise-toast');
+            if (!toast) return;
+            const msg = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+            toast.textContent = msg;
+            toast.classList.remove('hidden', 'toast-show');
+            void toast.offsetWidth;
+            toast.classList.add('toast-show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2200);
+        }
+
+        /* =====================================================================
+           10. 아날로그 시계 + 디지털 시계 + 출발 카운트다운 + 야간 모드 체크
+        ===================================================================== */
+        function buildAnalogClockFace() {
+            const ticksEl = document.getElementById('analog-ticks');
+            const numsEl = document.getElementById('analog-numbers');
+            if (!ticksEl || !numsEl) return;
+
+            let ticksHtml = '';
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6) * (Math.PI / 180);
+                const isMajor = i % 5 === 0;
+                const rOuter = 65;
+                const rInner = isMajor ? 58 : 61.5;
+                const x1 = 80 + rInner * Math.sin(angle);
+                const y1 = 80 - rInner * Math.cos(angle);
+                const x2 = 80 + rOuter * Math.sin(angle);
+                const y2 = 80 - rOuter * Math.cos(angle);
+                ticksHtml += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${isMajor ? '#253342' : '#94a3b8'}" stroke-width="${isMajor ? 2.6 : 1.3}" stroke-linecap="round"/>`;
+            }
+            ticksEl.innerHTML = ticksHtml;
+
+            let numsHtml = '';
+            for (let n = 1; n <= 12; n++) {
+                const angle = (n * 30) * (Math.PI / 180);
+                const r = 47;
+                const x = 80 + r * Math.sin(angle);
+                const y = 80 - r * Math.cos(angle);
+                const isQuarter = n % 3 === 0;
+                numsHtml += `<text x="${x.toFixed(1)}" y="${(y + 5.5).toFixed(1)}" text-anchor="middle" font-family="'Jua', sans-serif" font-size="${isQuarter ? 16.5 : 14}" font-weight="700" fill="${isQuarter ? '#dc2626' : '#253342'}">${n}</text>`;
+            }
+            numsEl.innerHTML = numsHtml;
+        }
+
+        function updateClockAndCountdown() {
+            const now = new Date();
+            ensureMorningReset();
+
+            // 1) 날짜 (요일 포함)
+            const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+            const dateStr = `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}`;
+            document.getElementById('clock-date').textContent = dateStr;
+
+            // 2) 디지털 시계 (12시간제)
+            const h24 = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ampm = h24 < 12 ? '오전' : '오후';
+            const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+
+            document.getElementById('clock-ampm').textContent = ampm;
+            document.getElementById('clock-hour').textContent = String(h12).padStart(2, '0');
+            document.getElementById('clock-min').textContent = String(m).padStart(2, '0');
+
+            // 야간 오버레이 시계
+            const nightClock = document.getElementById('night-clock');
+            if (nightClock) {
+                nightClock.textContent = `${String(h24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            }
+
+            // 3) 아날로그 시계 바늘 각도
+            const secDeg = s * 6;
+            const minDeg = m * 6 + s * 0.1;
+            const hourDeg = (h24 % 12) * 30 + m * 0.5;
+            document.getElementById('analog-hour-hand').setAttribute('transform', `rotate(${hourDeg} 80 80)`);
+            document.getElementById('analog-minute-hand').setAttribute('transform', `rotate(${minDeg} 80 80)`);
+            document.getElementById('analog-second-hand').setAttribute('transform', `rotate(${secDeg} 80 80)`);
+
+            // 4) 출발 카운트다운
+            const [depH, depM] = (settings.departTime || '08:50').split(':').map(Number);
+            const departLabel = document.getElementById('departure-label');
+            if (departLabel) {
+                const depAmpm = depH < 12 ? '오전' : '오후';
+                const depH12 = depH % 12 === 0 ? 12 : depH % 12;
+                departLabel.textContent = `출발 ${depAmpm} ${depH12}:${String(depM).padStart(2, '0')}`;
+            }
+
+            const target = new Date(now.getTime());
+            target.setHours(depH, depM, 0, 0);
+            const diffMin = Math.ceil((target - now) / 60000);
+            const cdVal = document.getElementById('countdown-value');
+            if (cdVal) {
+                if (diffMin > 60) {
+                    const hrs = Math.floor(diffMin / 60);
+                    const mins = diffMin % 60;
+                    cdVal.textContent = mins > 0 ? `${hrs}시간 ${mins}분 남았어요` : `${hrs}시간 남았어요`;
+                    cdVal.className = 'font-display text-2xl sm:text-[1.85rem] text-[#16a34a] tracking-tight';
+                } else if (diffMin > 0) {
+                    cdVal.textContent = `${diffMin}분 남았어요`;
+                    cdVal.className = `font-display text-2xl sm:text-[1.85rem] tracking-tight ${diffMin <= 15 ? 'text-[#ea580c]' : 'text-[#16a34a]'}`;
+                } else if (diffMin >= -15) {
+                    cdVal.textContent = '지금 출발해요! 🚌';
+                    cdVal.className = 'font-display text-2xl sm:text-[1.85rem] text-[#dc2626] tracking-tight';
+                } else {
+                    cdVal.textContent = '오늘도 즐거운 하루! ☀️';
+                    cdVal.className = 'font-display text-2xl sm:text-[1.85rem] text-[#2563eb] tracking-tight';
+                }
+            }
+
+            // 5) 야간 암전 모드 (기본 OFF, 사용자가 설정에서 켰거나 수동 미리보기일 때만 작동)
+            const isNightHour = h24 >= 22 || h24 < 7;
+            const shouldBlackout = manualNightPreview || (settings.autoNightBlackout && isNightHour && Date.now() > tempWakeUntil);
+            const overlay = document.getElementById('night-overlay');
+            if (overlay) {
+                overlay.classList.toggle('hidden', !shouldBlackout);
+            }
+        }
+
+        /* =====================================================================
+           11. 경기도 시흥시 목감동 날씨 & 미세먼지 (Open-Meteo, API 키 불필요)
+        ===================================================================== */
+        function getWeatherMeta(code) {
+            if (code === 0) return { icon: '☀️', text: '맑음' };
+            if (code <= 2) return { icon: '⛅', text: '구름 조금' };
+            if (code === 3) return { icon: '☁️', text: '흐림' };
+            if (code === 45 || code === 48) return { icon: '🌫️', text: '안개' };
+            if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return { icon: '🌧️', text: '비' };
+            if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return { icon: '❄️', text: '눈' };
+            if (code >= 95) return { icon: '⛈️', text: '천둥번개' };
+            return { icon: '🌤️', text: '대체로 맑음' };
+        }
+
+        function getDustGrade(pm10, pm25) {
+            if (pm10 > 150 || pm25 > 75) return { label: '매우나쁨', face: '😷', bg: '#dc2626' };
+            if (pm10 > 80 || pm25 > 35) return { label: '나쁨', face: '🙁', bg: '#f97316' };
+            if (pm10 > 30 || pm25 > 15) return { label: '보통', face: '🙂', bg: '#22c55e' };
+            return { label: '좋음', face: '😊', bg: '#3b82f6' };
+        }
+
+        async function fetchWeatherAndDust() {
+            const tipEl = document.getElementById('w-outing-tip');
+            try {
+                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${MOKGAM_LAT}&longitude=${MOKGAM_LON}&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=2`;
+                const dustUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${MOKGAM_LAT}&longitude=${MOKGAM_LON}&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
+
+                const [wRes, dRes] = await Promise.all([fetch(weatherUrl), fetch(dustUrl)]);
+                const wData = await wRes.json();
+                const dData = await dRes.json();
+
+                // 현재 날씨
+                const curTemp = Math.round(wData.current.temperature_2m);
+                const curMeta = getWeatherMeta(wData.current.weather_code);
+                const todayMax = Math.round(wData.daily.temperature_2m_max[0]);
+                const todayMin = Math.round(wData.daily.temperature_2m_min[0]);
+
+                document.getElementById('w-current-icon').textContent = curMeta.icon;
+                document.getElementById('w-current-temp').textContent = `${curTemp}°`;
+                document.getElementById('w-current-desc').textContent = curMeta.text;
+                document.getElementById('w-minmax').textContent = `최고 ${todayMax}° · 최저 ${todayMin}°`;
+
+                // 미세먼지
+                const pm10 = Math.round(dData?.current?.pm10 ?? 20);
+                const pm25 = Math.round(dData?.current?.pm2_5 ?? 12);
+                const dust = getDustGrade(pm10, pm25);
+                const dustBadge = document.getElementById('dust-badge');
+                if (dustBadge) dustBadge.style.backgroundColor = dust.bg;
+                document.getElementById('dust-face').textContent = dust.face;
+                document.getElementById('dust-grade').textContent = dust.label;
+                document.getElementById('w-dust-detail').textContent = `미세 ${pm10} · 초미세 ${pm25} μg`;
+
+                // 오른쪽 4칸: 오늘 8시, 12시, 16시 + 내일 날씨
+                const targetHours = [8, 12, 16];
+                const slotHtmls = targetHours.map(hr => {
+                    const idx = hr; // forecast_days=2, index 0..23은 오늘 0시..23시
+                    const t = Math.round(wData.hourly.temperature_2m[idx] ?? curTemp);
+                    const rain = Math.round(wData.hourly.precipitation_probability[idx] ?? 0);
+                    const meta = getWeatherMeta(wData.hourly.weather_code[idx] ?? 0);
+                    return `
+                        <div class="bg-[#f8fafc] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center border border-slate-200/80">
+                            <span class="text-[11px] font-black text-slate-500">${hr}시</span>
+                            <span class="text-lg leading-tight my-0.5">${meta.icon}</span>
+                            <span class="text-xs sm:text-sm font-black text-[#253342]">${t}°</span>
+                            <span class="text-[10px] font-bold text-[#2563eb]">비 ${rain}%</span>
+                        </div>
+                    `;
+                });
+
+                // 4번째 칸: 내일 날씨
+                const tmrMeta = getWeatherMeta(wData.daily.weather_code[1] ?? 0);
+                const tmrMax = Math.round(wData.daily.temperature_2m_max[1] ?? todayMax);
+                const tmrMin = Math.round(wData.daily.temperature_2m_min[1] ?? todayMin);
+                const tmrRain = Math.round(wData.daily.precipitation_probability_max[1] ?? 0);
+                slotHtmls.push(`
+                    <div class="bg-[#eff6ff] rounded-xl py-1 px-1 flex flex-col items-center justify-center text-center border border-blue-200">
+                        <span class="text-[11px] font-black text-[#1d4ed8]">내일</span>
+                        <span class="text-lg leading-tight my-0.5">${tmrMeta.icon}</span>
+                        <span class="text-xs sm:text-[13px] font-black text-[#253342]">${tmrMin}°/${tmrMax}°</span>
+                        <span class="text-[10px] font-bold text-[#2563eb]">비 ${tmrRain}%</span>
+                    </div>
+                `);
+
+                document.getElementById('w-slots').innerHTML = slotHtmls.join('');
+
+                // 나갈 때 옷차림 & 우산 팁
+                const tips = [];
+                const maxRainToday = Math.max(...wData.hourly.precipitation_probability.slice(7, 22));
+                if (maxRainToday >= 40) {
+                    tips.push(`비 확률 ${maxRainToday}% — 우산 챙기기 ☂️`);
+                }
+                if (curTemp <= 5) {
+                    tips.push(`현재 ${curTemp}° 추워요 — 두꺼운 패딩·장갑 🧥`);
+                } else if (curTemp <= 13) {
+                    tips.push(`현재 ${curTemp}° 쌀쌀해요 — 아이 겉옷 챙기기 🧥`);
+                } else if (curTemp >= 26) {
+                    tips.push(`현재 ${curTemp}° 더워요 — 시원한 옷·물통 챙기기 💧`);
+                } else {
+                    tips.push(`활동하기 좋은 ${curTemp}° 날씨예요 ☀️`);
+                }
+                if (dust.label === '나쁨' || dust.label === '매우나쁨') {
+                    tips.push('마스크 꼭 쓰기 😷');
+                }
+                if (tipEl) tipEl.textContent = tips.join(' · ');
+            } catch {
+                if (tipEl) tipEl.textContent = '날씨 정보를 다시 불러오는 중이에요...';
+            }
+        }
+
+        /* =====================================================================
+           12. Screen Wake Lock (화면 항상 켜짐 유지)
+        ===================================================================== */
+        async function requestWakeLock() {
+            const dot = document.getElementById('wakelock-dot');
+            const text = document.getElementById('wakelock-text');
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLockSentinel = await navigator.wakeLock.request('screen');
+                    if (dot) dot.textContent = '☀️';
+                    if (text) text.textContent = '항상 켜짐';
+                    wakeLockSentinel.addEventListener('release', () => {
+                        if (document.visibilityState === 'visible') {
+                            requestWakeLock();
+                        }
+                    });
+                } catch {
+                    if (dot) dot.textContent = '⚡';
+                    if (text) text.textContent = '켜짐 대기';
+                }
+            } else {
+                if (dot) dot.textContent = '☀️';
+                if (text) text.textContent = '항상 켜짐';
+            }
+        }
+
+        /* =====================================================================
+           13. 유틸 & 이벤트 바인딩
+        ===================================================================== */
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function bindEvents() {
+            // 모드 배지 전환 ('유치원' ↔ '가족 할 일')
+            document.getElementById('tab-kindergarten').addEventListener('click', () => switchMode('kindergarten'));
+            document.getElementById('tab-family').addEventListener('click', () => switchMode('family'));
+
+            // 시트 즉시 새로고침
+            document.getElementById('btn-sync-sheet').addEventListener('click', () => {
+                fetchSheetForMode(activeMode);
+            });
+
+            // 날씨 즉시 새로고침
+            document.getElementById('btn-refresh-weather').addEventListener('click', () => {
+                fetchWeatherAndDust();
+            });
+
+            // 야간 미리보기 버튼
+            document.getElementById('btn-night-preview').addEventListener('click', () => {
+                manualNightPreview = true;
+                updateClockAndCountdown();
+            });
+
+            // 야간 오버레이 터치 시 해제
+            document.getElementById('night-overlay').addEventListener('click', () => {
+                if (manualNightPreview) {
+                    manualNightPreview = false;
+                } else {
+                    tempWakeUntil = Date.now() + 20000; // 자동 야간 모드일 때는 20초 잠깐 보기
+                }
+                updateClockAndCountdown();
+            });
+
+            // Wake Lock 수동 재요청
+            document.getElementById('btn-wakelock').addEventListener('click', () => {
+                requestWakeLock();
+            });
+
+            // 설정 모달 열기/닫기/저장
+            const modal = document.getElementById('settings-modal');
+            const openModal = () => {
+                document.getElementById('input-child-name').value = settings.childName || '';
+                document.getElementById('input-depart-time').value = settings.departTime || '08:50';
+                document.getElementById('input-kinder-source').value = settings.kinderSource || '';
+                document.getElementById('input-auto-night').checked = !!settings.autoNightBlackout;
+                modal.classList.remove('hidden');
+            };
+            const closeModal = () => modal.classList.add('hidden');
+
+            document.getElementById('btn-open-settings').addEventListener('click', openModal);
+            document.getElementById('btn-close-settings').addEventListener('click', closeModal);
+            document.getElementById('btn-cancel-settings').addEventListener('click', closeModal);
+
+            document.getElementById('btn-save-settings').addEventListener('click', () => {
+                settings.childName = document.getElementById('input-child-name').value.trim() || '우리 아이';
+                settings.departTime = document.getElementById('input-depart-time').value || '08:50';
+                settings.kinderSource = document.getElementById('input-kinder-source').value.trim();
+                settings.autoNightBlackout = document.getElementById('input-auto-night').checked;
+                saveSettings();
+                closeModal();
+                updateClockAndCountdown();
+                renderTasks();
+                fetchSheetForMode('kindergarten');
+            });
+
+            document.getElementById('btn-reset-checks').addEventListener('click', () => {
+                checkState.checkedMap = {};
+                localStorage.setItem(STORAGE_KEYS.CHECKS, JSON.stringify(checkState));
+                renderTasks();
+                closeModal();
+            });
+
+            // 탭 복귀 시 Wake Lock 재연결
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            });
+            document.addEventListener('click', () => {
+                if (!wakeLockSentinel) requestWakeLock();
+            }, { once: true });
+        }
+
+        /* =====================================================================
+           14. 초기화 실행
+        ===================================================================== */
+        window.onload = function () {
+            setupPwaManifest();
+            buildAnalogClockFace();
+            bindEvents();
+            updateModeTabsUI();
+            renderAssigneeFilters();
+            renderTasks();
+            updateClockAndCountdown();
+            fetchWeatherAndDust();
+            requestWakeLock();
+
+            // 구글 시트 최초 로드 (현재 모드 우선, 나머지 모드도 백그라운드 동기화)
+            fetchSheetForMode(activeMode);
+            fetchSheetForMode(activeMode === 'kindergarten' ? 'family' : 'kindergarten');
+
+            // 1초마다 시계·카운트다운 갱신
+            setInterval(updateClockAndCountdown, 1000);
+            // 5분마다 구글 시트 자동 갱신
+            setInterval(() => fetchSheetForMode(activeMode), 5 * 60 * 1000);
+            // 30분마다 날씨·미세먼지 갱신
+            setInterval(fetchWeatherAndDust, 30 * 60 * 1000);
+        };
+    </script>
+</body>
+</html>
